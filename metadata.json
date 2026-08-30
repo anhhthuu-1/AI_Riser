@@ -1,0 +1,6 @@
+{
+  "name": "Sài Gòn Passport & Bullet Journal",
+  "description": "Mobile-first Neo-Brutalism digital passport and bullet journal for exploring Saigon culture, street food, Chinatown vibes, heritage, and coffee corners with spot suggestions, interactive map, and check-ins.",
+  "requestFramePermissions": ["geolocation", "camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

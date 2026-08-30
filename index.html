@@ -1,0 +1,3277 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Sài Gòn Passport & Bullet Journal</title>
+
+  <!-- Google Fonts: Space Grotesk + Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Leaflet.js Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'pop-bg': '#FAF8F5',
+            'pop-card': '#FFFFFF',
+            'pop-dark': '#0F172A',
+            'pop-red': '#FF4D4D',
+            'pop-red-light': '#FFE5E5',
+            'pop-yellow': '#FACC15',
+            'pop-yellow-light': '#FEF08A',
+            'pop-green': '#10B981',
+            'pop-green-light': '#D1FAE5',
+            'pop-purple': '#8B5CF6',
+            'pop-purple-light': '#EDE9FE',
+            'pop-cyan': '#06B6D4',
+            'pop-orange': '#FB923C',
+            'pop-pink': '#EC4899',
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            display: ['"Space Grotesk"', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+          },
+          boxShadow: {
+            'brutal-sm': '2px 2px 0px #0F172A',
+            'brutal': '3px 3px 0px #0F172A',
+            'brutal-md': '4px 4px 0px #0F172A',
+            'brutal-lg': '6px 6px 0px #0F172A',
+            'brutal-xl': '8px 8px 0px #0F172A',
+          },
+          borderWidth: {
+            '2.5': '2.5px',
+            '3': '3px',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Neo-Brutalism Utilities */
+    body {
+      background-color: #CBD5E1;
+      color: #0F172A;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .brutal-card {
+      background-color: #FFFFFF;
+      border: 2.5px solid #0F172A;
+      box-shadow: 4px 4px 0px #0F172A;
+      border-radius: 1rem;
+      transition: all 0.15s ease-in-out;
+    }
+
+    .brutal-card:hover {
+      box-shadow: 6px 6px 0px #0F172A;
+      transform: translateY(-2px);
+    }
+
+    .brutal-card-sm {
+      background-color: #FFFFFF;
+      border: 2px solid #0F172A;
+      box-shadow: 2.5px 2.5px 0px #0F172A;
+      border-radius: 0.75rem;
+    }
+
+    .brutal-btn {
+      border: 2px solid #0F172A;
+      box-shadow: 3px 3px 0px #0F172A;
+      transition: all 0.1s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .brutal-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #0F172A;
+    }
+
+    .sticker-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.15rem 0.5rem;
+      border: 1.5px solid #0F172A;
+      border-radius: 9999px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: -0.025em;
+    }
+
+    /* Floating Quẻ Cookie Animation */
+    @keyframes floatWobble {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-4px) rotate(-4deg); }
+      75% { transform: translateY(2px) rotate(4deg); }
+    }
+
+    .fortune-float-btn {
+      animation: floatWobble 3s infinite ease-in-out;
+    }
+
+    /* Passport Specific Styling */
+    .passport-paper {
+      background-color: #FBF9F1;
+      background-image: radial-gradient(#E2E8F0 1px, transparent 1px);
+      background-size: 16px 16px;
+    }
+
+    .passport-stamp-seal {
+      border: 3px dashed #DC2626;
+      color: #DC2626;
+      text-transform: uppercase;
+      transform: rotate(-12deg);
+      border-radius: 12px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 900;
+      mix-blend-mode: multiply;
+    }
+
+    .mrz-font {
+      font-family: 'Courier New', Courier, monospace;
+      letter-spacing: 2px;
+    }
+
+    /* Custom Leaflet Map styling for Neo-Brutalism */
+    .leaflet-popup-content-wrapper {
+      background: #FAF8F5 !important;
+      border: 2.5px solid #0F172A !important;
+      box-shadow: 4px 4px 0px #0F172A !important;
+      border-radius: 12px !important;
+      padding: 2px !important;
+    }
+
+    .leaflet-popup-tip {
+      background: #FAF8F5 !important;
+      border: 2px solid #0F172A !important;
+    }
+
+    .leaflet-container {
+      font-family: 'Plus Jakarta Sans', sans-serif !important;
+    }
+
+    /* Hide scrollbars for slick tabs */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-slate-200 flex justify-center selection:bg-pop-yellow selection:text-pop-dark">
+
+  <!-- ========================================================================= -->
+  <!-- RESPONSIVE APP CONTAINER (SCALES BEAUTIFULLY ON MOBILE, TABLET & DESKTOP) -->
+  <!-- ========================================================================= -->
+  <div id="app-container" class="w-full max-w-6xl min-h-screen bg-pop-bg border-x-0 md:border-x-2.5 border-pop-dark shadow-2xl relative flex flex-col pb-24 mx-auto transition-all">
+
+    <!-- ========================================================================= -->
+    <!-- HEADER: USER PROFILE, TITLE & METRO PROGRESS BAR -->
+    <!-- ========================================================================= -->
+    <header class="bg-white border-b-2.5 border-pop-dark p-3.5 sm:p-5 sticky top-0 z-30 shadow-brutal-sm">
+      <div class="flex items-center justify-between gap-3 mb-3">
+        <!-- User Avatar & Title -->
+        <div class="flex items-center gap-3">
+          <div id="header-avatar" class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-pop-yellow border-2.5 border-pop-dark shadow-brutal-sm flex items-center justify-center text-2xl shrink-0 cursor-pointer hover:rotate-6 transition" onclick="openPassportProfile()" title="Xem Hộ Chiếu Của Tôi">
+            🛵
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <h1 id="header-title" class="font-display font-black text-base sm:text-lg lg:text-xl tracking-tight uppercase text-pop-dark truncate max-w-[240px] sm:max-w-md">
+                SÀI GÒN PASSPORT
+              </h1>
+              <span class="sticker-tag bg-pop-red text-white text-[9px] sm:text-[10px] px-1.5 py-0.5">VI VU SÀI GÒN</span>
+            </div>
+            <p id="header-subtitle" class="text-xs font-bold text-slate-500 truncate">
+              Hành trình ghi dấu góc phố & nhật ký du ngoạn Sài Gòn
+            </p>
+          </div>
+        </div>
+
+        <!-- Top Right Actions: Check-in button, Activity Log & Logout -->
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <button onclick="openCheckinModal()" class="brutal-btn px-2.5 sm:px-4 py-2 bg-pop-red hover:bg-red-500 text-white rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 shadow-brutal-sm">
+            <i class="fa-solid fa-stamp text-pop-yellow"></i>
+            <span>Check-in Mới</span>
+          </button>
+          
+          <button onclick="openActivityModal()" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-purple-100 hover:bg-purple-200 border-2 border-pop-dark text-pop-purple flex items-center justify-center text-sm brutal-btn shrink-0" title="Nhật ký hoạt động của tôi">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+          </button>
+
+          <button onclick="promptLogout()" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 hover:bg-slate-200 border-2 border-pop-dark text-slate-700 flex items-center justify-center text-sm brutal-btn shrink-0" title="Đổi Hộ Chiếu / Đăng Xuất">
+            <i class="fa-solid fa-passport text-pop-purple"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Metro Line 1 Coverage Progress Bar -->
+      <div class="bg-pop-bg rounded-xl border-2 border-pop-dark p-2.5 sm:p-3 space-y-1.5 shadow-brutal-sm">
+        <div class="flex items-center justify-between text-xs font-black">
+          <span class="flex items-center gap-1.5 text-pop-dark">
+            <span class="text-sm">🚊</span>
+            <span>TIẾN ĐỘ METRO LINE 1: BẾN THÀNH - SUỐI TIÊN</span>
+          </span>
+          <span id="metro-progress-text" class="text-pop-purple font-mono font-black text-xs sm:text-sm">
+            0% Phủ Sóng (0/15)
+          </span>
+        </div>
+        
+        <!-- Animated Track -->
+        <div class="w-full h-3.5 bg-white rounded-full border-2 border-pop-dark overflow-hidden p-0.5">
+          <div id="metro-progress-fill" class="h-full bg-gradient-to-r from-pop-yellow via-pop-red to-pop-purple rounded-full border border-pop-dark transition-all duration-500" style="width: 20%;"></div>
+        </div>
+
+        <!-- Dynamic User Rank / Badge -->
+        <div class="flex items-center justify-between text-xs font-bold text-slate-600 pt-0.5">
+          <span class="flex items-center gap-1.5">
+            <span>Danh hiệu:</span>
+            <span id="user-badge-tag" class="sticker-tag bg-pop-yellow text-pop-dark text-[10px]">
+              Chiếu Mới Sài Thành 🐣
+            </span>
+          </span>
+          <span id="total-stamps-count" class="font-mono text-pop-dark font-black">0 Con Dấu</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- ========================================================================= -->
+    <!-- MAIN CONTENT VIEW AREA (TAB ROUTING: 4 TABS - RESPONSIVE GRID) -->
+    <!-- ========================================================================= -->
+    <main class="flex-1 p-3.5 sm:p-6 space-y-4 sm:space-y-6 max-w-6xl mx-auto w-full">
+      
+      <!-- ======================================================================= -->
+      <!-- TAB 1: NHẬT KÝ (FEED / POLAROID JOURNAL) -->
+      <!-- ======================================================================= -->
+      <section id="view-journal" class="space-y-4 block">
+        
+        <!-- Filter & Search Bar -->
+        <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+          <div class="relative flex-1 min-w-[220px]">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs sm:text-sm"></i>
+            <input type="text" id="search-input" oninput="handleFilterAndSearch()" placeholder="Tìm quán, món, quận, sao..." class="w-full pl-9 pr-4 py-2 bg-white rounded-xl border-2 border-pop-dark text-xs sm:text-sm font-bold focus:outline-none focus:bg-pop-yellow-light">
+          </div>
+          
+          <select id="category-filter" onchange="handleFilterAndSearch()" class="bg-white px-3 py-2 rounded-xl border-2 border-pop-dark text-xs sm:text-sm font-bold focus:outline-none focus:bg-pop-yellow-light min-w-[160px]">
+            <option value="ALL">🌟 Tất Cả Thể Loại</option>
+            <option value="Góc Phố Cà Phê">☕ Cà Phê Sài Gòn</option>
+            <option value="Vibe Chợ Lớn (Khu Người Hoa)">🏮 Vibe Chợ Lớn</option>
+            <option value="Chùa Chiền & Tâm Linh">⛩️ Chùa Chiền & Tâm Linh</option>
+            <option value="Sài Gòn Đêm & Món Đường Phố">🍢 Ăn Đêm & Phố Xá</option>
+            <option value="Chợ Sài Gòn & Di Sản">🏛️ Chợ & Di Sản</option>
+            <option value="Mua Sắm & Thrift">🛍️ Mua Sắm & Thrift</option>
+          </select>
+        </div>
+
+        <!-- Feed List Container (Responsive Grid on Tablet/Desktop) -->
+        <div id="journal-feed-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          <!-- Dynamically populated Polaroid cards -->
+        </div>
+
+        <!-- Empty Feed State -->
+        <div id="journal-empty-state" class="hidden p-8 sm:p-12 text-center bg-white rounded-2xl border-2.5 border-pop-dark shadow-brutal-md space-y-3 max-w-md mx-auto">
+          <div class="text-5xl animate-bounce">🛵</div>
+          <h3 class="font-display font-black text-lg text-pop-dark uppercase">Chưa có ký ức nào!</h3>
+          <p class="text-xs sm:text-sm text-slate-600 font-bold">
+            Hãy bấm nút <strong class="text-pop-red">Check-in Mới</strong> để chụp ảnh góc phố, chấm sao vibe và nhận con dấu số đầu tiên!
+          </p>
+          <button onclick="openCheckinModal()" class="brutal-btn px-5 py-2.5 bg-pop-yellow hover:bg-pop-yellow-light text-pop-dark font-black text-xs sm:text-sm rounded-xl inline-flex items-center gap-2">
+            <i class="fa-solid fa-camera"></i>
+            <span>Đóng Dấu Đầu Tiên Ngay</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ======================================================================= -->
+      <!-- TAB 2: LỊCH TRÌNH VI VU (TRIP PLANNER & ITINERARY) -->
+      <!-- ======================================================================= -->
+      <section id="view-planner" class="space-y-4 hidden">
+        <!-- Planner Top Bar -->
+        <div class="bg-pop-purple/15 p-3.5 sm:p-4 rounded-2xl border-2.5 border-pop-dark flex items-center justify-between shadow-brutal-sm flex-wrap gap-2">
+          <div>
+            <h2 class="font-display font-black text-sm sm:text-base text-pop-dark uppercase flex items-center gap-1.5">
+              <span>🛵</span>
+              <span>LÊN LỊCH TRÌNH VI VU SÀI GÒN</span>
+            </h2>
+            <p class="text-xs font-bold text-slate-600">Lên kế hoạch dạo phố, khám phá ẩm thực & bấm chuyển thành Check-in!</p>
+          </div>
+          <button onclick="openPlanModal()" class="brutal-btn px-4 py-2 bg-pop-purple hover:bg-purple-600 text-white rounded-xl text-xs sm:text-sm font-black flex items-center gap-1.5 shadow-brutal-sm">
+            <i class="fa-solid fa-plus text-pop-yellow"></i>
+            <span>Tạo Kế Hoạch Mới</span>
+          </button>
+        </div>
+
+        <!-- Trips List Container -->
+        <div id="planner-trips-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
+          <!-- Dynamically populated Trip Plan cards -->
+        </div>
+
+        <!-- Empty Trip State -->
+        <div id="planner-empty-state" class="hidden p-8 sm:p-12 text-center bg-white rounded-2xl border-2.5 border-pop-dark shadow-brutal-md space-y-3 max-w-md mx-auto">
+          <div class="text-5xl">🗺️</div>
+          <h3 class="font-display font-black text-lg text-pop-dark uppercase">Chưa có lịch trình nào!</h3>
+          <p class="text-xs sm:text-sm text-slate-600 font-bold">
+            Lên kế hoạch một chuyến Foodtour Chợ Lớn hay Dạo Cà Phê Bệt Quận 1 cùng cạ cứng ngay!
+          </p>
+          <button onclick="openPlanModal()" class="brutal-btn px-5 py-2.5 bg-pop-purple hover:bg-purple-600 text-white font-black text-xs sm:text-sm rounded-xl inline-flex items-center gap-2">
+            <i class="fa-solid fa-calendar-plus text-pop-yellow"></i>
+            <span>Tạo Lịch Trình Ngay</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ======================================================================= -->
+      <!-- TAB 3: BỘ SƯU TẬP (6 THEMATIC CATEGORIES & UNLOCKS) -->
+      <!-- ======================================================================= -->
+      <section id="view-collections" class="space-y-4 hidden">
+        <div class="bg-pop-yellow/30 p-3.5 sm:p-4 rounded-2xl border-2.5 border-pop-dark flex items-center justify-between shadow-brutal-sm flex-wrap gap-2">
+          <div>
+            <h2 class="font-display font-black text-sm sm:text-base text-pop-dark uppercase">6 BỘ SƯU TẬP VĂN HÓA SÀI GÒN</h2>
+            <p class="text-xs font-bold text-slate-600">Khám phá và check-in đủ 6 bộ sưu tập để nhận danh hiệu Thổ Địa Sài Thành 🏆</p>
+          </div>
+          <span id="collections-completed-badge" class="sticker-tag bg-pop-dark text-pop-yellow text-xs px-3 py-1">
+            0/6 Hoàn Tất
+          </span>
+        </div>
+
+        <div id="collections-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          <!-- Dynamically rendered collection cards -->
+        </div>
+      </section>
+
+      <!-- ======================================================================= -->
+      <!-- TAB 4: BẢN ĐỒ KÝ ỨC (INTERACTIVE LEAFLET MAP) -->
+      <!-- ======================================================================= -->
+      <section id="view-map" class="space-y-3.5 hidden">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <span class="text-xl">🗺️</span>
+            <h2 class="font-display font-black text-sm sm:text-base text-pop-dark uppercase">BẢN ĐỒ DẤU CHÂN SÀI GÒN</h2>
+          </div>
+          <button onclick="locateUserOnMap()" class="brutal-btn px-3 py-1.5 bg-pop-cyan hover:bg-cyan-400 text-white rounded-xl text-xs font-black flex items-center gap-1.5 shadow-brutal-sm">
+            <i class="fa-solid fa-crosshairs"></i>
+            <span>Định vị GPS của tôi</span>
+          </button>
+        </div>
+
+        <!-- Leaflet Map Container -->
+        <div class="w-full h-[65vh] sm:h-[72vh] rounded-2xl border-2.5 border-pop-dark shadow-brutal-md overflow-hidden relative">
+          <div id="saigon-map" class="w-full h-full z-10"></div>
+          
+          <!-- Floating Legend -->
+          <div class="absolute bottom-3 left-3 z-20 bg-white/95 backdrop-blur-xs p-2.5 rounded-xl border-2 border-pop-dark shadow-brutal-sm text-[11px] font-black space-y-1">
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-pop-red border border-pop-dark"></span> <span>Cà Phê</span></div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-pop-yellow border border-pop-dark"></span> <span>Chợ Lớn</span></div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-pop-purple border border-pop-dark"></span> <span>Chùa Chiền</span></div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-pop-green border border-pop-dark"></span> <span>Ăn Đêm</span></div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-pop-cyan border border-pop-dark"></span> <span>Di Sản</span></div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-pop-pink border border-pop-dark"></span> <span>Mua Sắm & Thrift</span></div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ========================================================================= -->
+    <!-- FLOATING FORTUNE COOKIE (QUẺ CÀ PHÊ SÀI GÒN 🥠) -->
+    <!-- ========================================================================= -->
+    <div class="fixed bottom-20 right-4 sm:right-8 lg:right-12 z-40">
+      <button onclick="openFortuneModal()" class="fortune-float-btn w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-pop-yellow hover:bg-pop-yellow-light border-3 border-pop-dark shadow-brutal-md flex flex-col items-center justify-center text-pop-dark group" title="Bốc Quẻ Sài Gòn / Hôm nay đi đâu?">
+        <span class="text-2xl sm:text-3xl group-hover:scale-110 transition">🥠</span>
+        <span class="text-[8px] font-black uppercase tracking-tighter bg-pop-red text-white px-1.5 rounded-sm border border-pop-dark -mt-1">BỐC QUẺ</span>
+      </button>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- BOTTOM NAVIGATION (4 TABS - FLUID & RESPONSIVE) -->
+    <!-- ========================================================================= -->
+    <nav class="fixed bottom-0 left-0 right-0 z-40 bg-white border-t-2.5 border-pop-dark py-2 px-3 sm:py-2.5 sm:px-6 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] max-w-6xl mx-auto">
+      <div class="grid grid-cols-4 gap-2 sm:gap-4 max-w-md mx-auto sm:max-w-xl">
+        
+        <!-- Tab 1: Nhật Ký -->
+        <button id="nav-tab-journal" onclick="switchTab('journal')" class="py-2 px-2 rounded-xl border-2 border-pop-dark bg-pop-yellow shadow-brutal-sm flex flex-col items-center justify-center text-pop-dark transition">
+          <i class="fa-solid fa-book-bookmark text-sm sm:text-base"></i>
+          <span class="text-[10px] sm:text-xs font-black uppercase mt-0.5 tracking-tight">Nhật Ký</span>
+        </button>
+
+        <!-- Tab 2: Lịch Trình -->
+        <button id="nav-tab-planner" onclick="switchTab('planner')" class="py-2 px-2 rounded-xl border-2 border-transparent hover:border-pop-dark bg-slate-50 flex flex-col items-center justify-center text-slate-700 transition">
+          <i class="fa-solid fa-route text-sm sm:text-base"></i>
+          <span class="text-[10px] sm:text-xs font-black uppercase mt-0.5 tracking-tight">Lịch Trình</span>
+        </button>
+
+        <!-- Tab 3: Bộ Sưu Tập -->
+        <button id="nav-tab-collections" onclick="switchTab('collections')" class="py-2 px-2 rounded-xl border-2 border-transparent hover:border-pop-dark bg-slate-50 flex flex-col items-center justify-center text-slate-700 transition">
+          <i class="fa-solid fa-layer-group text-sm sm:text-base"></i>
+          <span class="text-[10px] sm:text-xs font-black uppercase mt-0.5 tracking-tight">Bộ Sưu Tập</span>
+        </button>
+
+        <!-- Tab 4: Bản Đồ -->
+        <button id="nav-tab-map" onclick="switchTab('map')" class="py-2 px-2 rounded-xl border-2 border-transparent hover:border-pop-dark bg-slate-50 flex flex-col items-center justify-center text-slate-700 transition">
+          <i class="fa-solid fa-map-location-dot text-sm sm:text-base"></i>
+          <span class="text-[10px] sm:text-xs font-black uppercase mt-0.5 tracking-tight">Bản Đồ</span>
+        </button>
+
+      </div>
+    </nav>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: AUTH / PASSPORT LOGIN SCREEN (NEW USER VS EXISTING ACCOUNTS) -->
+  <!-- ========================================================================= -->
+  <div id="auth-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 hidden overflow-y-auto">
+    <div class="max-w-xl w-full rounded-2xl border-3 border-pop-dark shadow-brutal-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200 my-auto bg-white flex flex-col">
+      
+      <!-- Passport Navy/Gold Cover Header -->
+      <div class="bg-[#102A43] text-amber-300 p-3.5 sm:p-4 border-b-3 border-pop-dark relative overflow-hidden text-center space-y-1">
+        <!-- Gold Emblem Icon -->
+        <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 border-amber-400 mx-auto flex items-center justify-center text-2xl bg-[#1E3A5F] shadow-inner text-amber-300">
+          🧭
+        </div>
+        <h2 class="font-display font-black text-xs sm:text-sm tracking-widest uppercase text-amber-200">
+          SỔ TAY KHÁM PHÁ & KÝ SỰ GÓC PHỐ
+        </h2>
+        <p class="text-[10px] text-amber-400/90 tracking-wider font-semibold">
+          SAIGON TRAVEL PASSPORT & EXPLORER JOURNAL
+        </p>
+        <div class="pt-0.5">
+          <h1 class="font-display font-black text-base sm:text-xl tracking-wide uppercase text-white drop-shadow">
+            HỘ CHIẾU DU HÀNH SÀI GÒN
+          </h1>
+          <p class="text-[10px] sm:text-[11px] font-mono font-bold text-amber-300 uppercase tracking-widest">
+            PASSPORT · SÀI GÒN EXPLORER
+          </p>
+        </div>
+      </div>
+
+      <!-- Tab Switcher: Tạo Hộ Chiếu Mới vs Đổi Hộ Chiếu Đã Có -->
+      <div class="flex items-center border-b-2.5 border-pop-dark bg-slate-100 p-1.5 gap-1.5 shrink-0">
+        <button type="button" id="auth-tab-register-btn" onclick="switchAuthTab('register')" class="flex-1 py-2 px-2.5 rounded-xl border-2 border-pop-dark bg-pop-yellow text-pop-dark font-black text-xs uppercase flex items-center justify-center gap-1.5 shadow-brutal-sm transition">
+          <span>✨ Tạo Hộ Chiếu Mới</span>
+        </button>
+        <button type="button" id="auth-tab-switch-btn" onclick="switchAuthTab('switch')" class="flex-1 py-2 px-2.5 rounded-xl border-2 border-transparent hover:border-slate-300 bg-white text-slate-700 font-bold text-xs uppercase flex items-center justify-center gap-1.5 transition">
+          <span>👥 Đổi Hộ Chiếu (<span id="user-count-badge">0</span>)</span>
+        </button>
+      </div>
+
+      <!-- Passport Inner Security Data Page -->
+      <div class="passport-paper p-3.5 sm:p-5 space-y-4 text-pop-dark relative max-h-[75vh] overflow-y-auto">
+        
+        <!-- PANEL 1: REGISTER / NEW USER -->
+        <div id="auth-panel-register" class="space-y-3.5">
+          <!-- Passport Meta Subheader (P / VNM / Passport No) -->
+          <div class="grid grid-cols-3 gap-2 border-b-2 border-dashed border-pop-dark/30 pb-2 text-[10px] sm:text-xs font-mono font-black">
+            <div>
+              <span class="text-slate-500 block text-[8px] uppercase">Loại / Type</span>
+              <span class="text-pop-dark">P (Passport)</span>
+            </div>
+            <div>
+              <span class="text-slate-500 block text-[8px] uppercase">Mã Nước / Code</span>
+              <span class="text-pop-dark">VNM</span>
+            </div>
+            <div class="text-right">
+              <span class="text-slate-500 block text-[8px] uppercase">Số Hộ Chiếu / No.</span>
+              <span id="passport-number-preview" class="text-pop-red font-bold">SG-2026-EXP</span>
+            </div>
+          </div>
+
+          <form id="passport-auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-3.5">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 items-start">
+              
+              <!-- Left: Passport 3x4 Photo Frame & Saigon Avatar Choices (4 cols) -->
+              <div class="sm:col-span-4 space-y-2 text-center">
+                <div class="relative w-28 h-36 mx-auto rounded-xl border-2.5 border-pop-dark bg-white shadow-brutal-sm overflow-hidden flex flex-col items-center justify-center p-2 group">
+                  <div id="passport-photo-display" class="text-5xl transform group-hover:scale-110 transition duration-200">
+                    🛵
+                  </div>
+                  <div class="absolute bottom-1 text-[8px] font-black uppercase tracking-widest text-slate-400">
+                    ẢNH 3x4 SÀI GÒN
+                  </div>
+                  <!-- Mini Stamp Watermark -->
+                  <div class="absolute -top-1 -right-1 w-7 h-7 rounded-full border border-red-500/60 text-red-500 flex items-center justify-center text-[7px] font-black rotate-12 pointer-events-none">
+                    SG
+                  </div>
+                </div>
+
+                <!-- Mascot Stamp Picker -->
+                <div>
+                  <label class="block text-[10px] font-black uppercase text-slate-600 mb-1">
+                    Linh vật đại diện:
+                  </label>
+                  <div class="grid grid-cols-3 gap-1.5">
+                    <button type="button" onclick="selectAvatar('🛵')" class="avatar-opt-btn p-1 rounded-lg border-2 border-pop-dark bg-pop-yellow text-xl flex items-center justify-center shadow-brutal-sm hover:scale-105 transition" data-avatar="🛵" title="Xe máy vi vu">🛵</button>
+                    <button type="button" onclick="selectAvatar('🥤')" class="avatar-opt-btn p-1 rounded-lg border-2 border-slate-300 bg-white text-xl flex items-center justify-center hover:border-pop-dark hover:scale-105 transition" data-avatar="🥤" title="Cà phê vợt">🥤</button>
+                    <button type="button" onclick="selectAvatar('🍧')" class="avatar-opt-btn p-1 rounded-lg border-2 border-slate-300 bg-white text-xl flex items-center justify-center hover:border-pop-dark hover:scale-105 transition" data-avatar="🍧" title="Chè đá">🍧</button>
+                    <button type="button" onclick="selectAvatar('🐱')" class="avatar-opt-btn p-1 rounded-lg border-2 border-slate-300 bg-white text-xl flex items-center justify-center hover:border-pop-dark hover:scale-105 transition" data-avatar="🐱" title="Mèo Sài Gòn">🐱</button>
+                    <button type="button" onclick="selectAvatar('🥟')" class="avatar-opt-btn p-1 rounded-lg border-2 border-slate-300 bg-white text-xl flex items-center justify-center hover:border-pop-dark hover:scale-105 transition" data-avatar="🥟" title="Sủi cảo Chợ Lớn">🥟</button>
+                    <button type="button" onclick="selectAvatar('🏮')" class="avatar-opt-btn p-1 rounded-lg border-2 border-slate-300 bg-white text-xl flex items-center justify-center hover:border-pop-dark hover:scale-105 transition" data-avatar="🏮" title="Lồng đèn phố cổ">🏮</button>
+                  </div>
+                  <input type="hidden" id="auth-selected-avatar" value="🛵">
+                </div>
+              </div>
+
+              <!-- Right: Identity Fields (8 cols) -->
+              <div class="sm:col-span-8 space-y-2.5 text-xs">
+                
+                <!-- Full Name (Nickname Input) -->
+                <div>
+                  <label class="block text-[10px] font-black uppercase text-slate-700 mb-0.5">
+                    Họ và tên / Full Name (Nickname Sài Gòn) <span class="text-pop-red">*</span>
+                  </label>
+                  <input type="text" id="auth-username" required oninput="updatePassportSignature(this.value)" placeholder="VD: BẮP CÀ PHÊ, TRÍ SÀI GÒN..." class="w-full px-3 py-2 bg-white rounded-xl border-2 border-pop-dark font-black text-sm uppercase focus:outline-none focus:bg-pop-yellow-light">
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 font-mono">
+                  <div>
+                    <span class="text-slate-500 block text-[9px] uppercase font-bold">Quốc tịch / Nationality</span>
+                    <span class="font-black text-pop-dark text-[11px]">VIỆT NAM / SÀI GÒN</span>
+                  </div>
+                  <div>
+                    <span class="text-slate-500 block text-[9px] uppercase font-bold">Ngày cấp / Date of Issue</span>
+                    <span class="font-black text-pop-dark text-[11px]">2026 · VĨNH VIỄN</span>
+                  </div>
+                </div>
+
+                <!-- Initial Data Option for New Users -->
+                <div class="p-2.5 bg-white rounded-xl border-2 border-pop-dark space-y-1.5">
+                  <span class="block text-[10px] font-black uppercase text-slate-700">Khởi tạo dữ liệu cho Hộ Chiếu này:</span>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs font-bold">
+                    <label class="p-2 rounded-lg border-2 border-pop-dark bg-amber-50/80 flex items-start gap-1.5 cursor-pointer">
+                      <input type="radio" name="auth-init-data" value="clean" checked class="mt-0.5 accent-pop-red">
+                      <div class="text-[10px] leading-tight">
+                        <strong class="text-pop-dark block">🌱 Hộ Chiếu Trắng</strong>
+                        <span class="text-slate-500 text-[9px]">0 con dấu, bắt đầu hành trình riêng</span>
+                      </div>
+                    </label>
+
+                    <label class="p-2 rounded-lg border-2 border-slate-300 bg-white flex items-start gap-1.5 cursor-pointer">
+                      <input type="radio" name="auth-init-data" value="seed" class="mt-0.5 accent-pop-red">
+                      <div class="text-[10px] leading-tight">
+                        <strong class="text-pop-dark block">⭐ Nạp 8 Điểm Mẫu</strong>
+                        <span class="text-slate-500 text-[9px]">Có sẵn 8 góc phố nổi tiếng</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- Bearer's Signature Line -->
+                <div class="pt-0.5">
+                  <span class="text-slate-500 block text-[9px] uppercase font-bold">Chữ ký người mang hộ chiếu / Bearer's Signature</span>
+                  <div id="passport-signature-preview" class="h-7 border-b-2 border-dashed border-pop-dark flex items-center px-2 font-serif italic text-base font-black text-blue-900">
+                    Bắp Cà Phê
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Machine Readable Zone (MRZ Font) -->
+            <div class="bg-white/80 p-2 rounded-xl border-2 border-pop-dark/40 font-mono text-[9px] sm:text-[10px] leading-tight text-slate-700 overflow-x-auto select-none space-y-0.5">
+              <div id="mrz-line-1">P&lt;VNMSAI&lt;GON&lt;&lt;EXPLORER&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+              <div>SG2026888&lt;9VNM0101018M&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;</div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="w-full brutal-btn py-3 bg-pop-red hover:bg-red-500 text-white rounded-xl font-black text-sm sm:text-base shadow-brutal uppercase tracking-wider flex items-center justify-center gap-2">
+              <i class="fa-solid fa-stamp text-pop-yellow text-lg"></i>
+              <span>KÍCH HOẠT HỘ CHIẾU & BẮT ĐẦU VI VU</span>
+              <span>🚀</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- PANEL 2: SWITCH EXISTING ACCOUNTS -->
+        <div id="auth-panel-switch" class="space-y-3 hidden">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black uppercase text-pop-dark">Các Hộ Chiếu Đã Lưu Trên Thiết Bị:</span>
+            <button type="button" onclick="switchAuthTab('register')" class="text-[11px] font-black text-pop-purple hover:underline flex items-center gap-1">
+              <i class="fa-solid fa-plus"></i> <span>Tạo Hộ Chiếu Mới</span>
+            </button>
+          </div>
+
+          <!-- User accounts list -->
+          <div id="auth-accounts-list" class="space-y-2 max-h-64 overflow-y-auto p-1">
+            <!-- Dynamically rendered account cards -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: NHẬT KÝ HOẠT ĐỘNG NGƯỜI DÙNG (ACTIVITY TIMELINE MODAL) -->
+  <!-- ========================================================================= -->
+  <div id="activity-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-5 hidden overflow-y-auto">
+    <div class="bg-white max-w-lg w-full rounded-2xl border-3 border-pop-dark shadow-brutal-xl my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+      
+      <!-- Activity Modal Header -->
+      <div class="bg-pop-purple p-3.5 sm:p-4 border-b-2.5 border-pop-dark flex items-center justify-between text-white shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">📜</span>
+          <div>
+            <h3 class="font-display font-black text-base sm:text-lg uppercase tracking-tight">NHẬT KÝ HOẠT ĐỘNG</h3>
+            <p id="activity-modal-subtitle" class="text-[10px] sm:text-[11px] font-bold text-purple-200">Lịch sử ghi dấu của bạn tại Sài Gòn</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeActivityModal()" class="w-8 h-8 rounded-xl bg-white hover:bg-slate-100 border-2 border-pop-dark text-pop-dark flex items-center justify-center transition font-bold shadow-brutal-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Activity User Summary Banner -->
+      <div class="bg-purple-50 p-3 border-b-2 border-pop-dark/20 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2.5">
+          <div id="activity-user-avatar" class="w-10 h-10 rounded-xl bg-pop-yellow border-2 border-pop-dark flex items-center justify-center text-xl shadow-brutal-sm">
+            🛵
+          </div>
+          <div>
+            <div id="activity-user-name" class="font-display font-black text-sm text-pop-dark uppercase">Bắp Cà Phê</div>
+            <div id="activity-user-stats" class="text-[10px] text-slate-600 font-bold">0 Con Dấu · 0 Lịch Trình</div>
+          </div>
+        </div>
+
+        <button onclick="clearUserActivities()" class="text-[10px] font-bold text-pop-red hover:underline px-2 py-1 bg-white rounded-lg border border-red-200" title="Xóa lịch sử ghi nhớ">
+          Xóa lịch sử
+        </button>
+      </div>
+
+      <!-- Activity Timeline List -->
+      <div id="activity-timeline-list" class="p-3.5 sm:p-4 space-y-2.5 overflow-y-auto flex-1">
+        <!-- Dynamically rendered activity items -->
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-3 bg-slate-50 border-t-2 border-pop-dark flex items-center justify-end shrink-0">
+        <button type="button" onclick="closeActivityModal()" class="brutal-btn px-4 py-1.5 bg-pop-dark hover:bg-slate-800 text-white rounded-xl font-black text-xs">
+          Đóng
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: CHECK-IN MỚI (REAL GPS + REAL PHOTO + VIBE REVIEW) -->
+  <!-- ========================================================================= -->
+  <div id="checkin-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-2.5 sm:p-4 hidden overflow-y-auto">
+    <div class="bg-pop-bg max-w-lg w-full rounded-2xl border-3 border-pop-dark shadow-brutal-xl my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[92vh]">
+      
+      <!-- Modal Header -->
+      <div class="bg-pop-red p-3 sm:p-4 border-b-2.5 border-pop-dark flex items-center justify-between text-white shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="text-xl sm:text-2xl">📸</span>
+          <div>
+            <h3 class="font-display font-black text-base sm:text-lg uppercase tracking-tight">ĐÓNG DẤU CHECK-IN SÀI GÒN</h3>
+            <p class="text-[10px] sm:text-[11px] font-bold text-amber-200">GPS thực tế + Ảnh chân thực + Đánh giá Vibe</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeCheckinModal()" class="w-8 h-8 rounded-xl bg-white hover:bg-slate-100 border-2 border-pop-dark text-pop-dark flex items-center justify-center transition font-bold shadow-brutal-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body Form -->
+      <form id="checkin-form" onsubmit="handleCheckinSubmit(event)" class="p-3.5 sm:p-4 space-y-3 overflow-y-auto flex-1">
+        
+        <!-- 1. Real Photo Upload / Camera Capture -->
+        <div class="space-y-1.5 bg-white p-3 rounded-xl border-2 border-pop-dark shadow-brutal-sm">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-black uppercase text-pop-dark tracking-wide">
+              1. Ảnh Chụp Thực Tế <span class="text-pop-red">*</span>
+            </label>
+            <span id="photo-source-indicator" class="text-[10px] font-mono font-bold text-pop-green flex items-center gap-1">
+              <i class="fa-solid fa-circle-check text-pop-green"></i> <span>Ảnh chân thực</span>
+            </span>
+          </div>
+          
+          <div class="grid grid-cols-3 gap-1.5">
+            <input type="file" id="input-camera-file" accept="image/*" capture="environment" onchange="handleImageFileSelect(event)" class="hidden">
+            <input type="file" id="input-photo-file" accept="image/*" onchange="handleImageFileSelect(event)" class="hidden">
+            
+            <button type="button" onclick="document.getElementById('input-camera-file').click()" class="brutal-btn py-1.5 px-2 bg-pop-red hover:bg-red-500 text-white text-[11px] font-black flex items-center justify-center gap-1 rounded-xl">
+              <i class="fa-solid fa-camera"></i>
+              <span>Chụp Ảnh</span>
+            </button>
+
+            <button type="button" onclick="document.getElementById('input-photo-file').click()" class="brutal-btn py-1.5 px-2 bg-pop-yellow hover:bg-pop-yellow-light text-pop-dark text-[11px] font-black flex items-center justify-center gap-1 rounded-xl">
+              <i class="fa-solid fa-images"></i>
+              <span>Thư Viện</span>
+            </button>
+
+            <button type="button" onclick="loadRandomSaigonPhoto()" class="brutal-btn py-1.5 px-2 bg-white hover:bg-slate-100 text-slate-800 text-[11px] font-black flex items-center justify-center gap-1 rounded-xl">
+              <i class="fa-solid fa-shuffle text-pop-purple"></i>
+              <span>Ảnh Mẫu</span>
+            </button>
+          </div>
+
+          <!-- Image Preview -->
+          <div class="relative w-full h-40 sm:h-44 rounded-xl overflow-hidden border-2 border-pop-dark bg-slate-900 flex items-center justify-center group">
+            <img id="image-preview-img" src="https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&auto=format&fit=crop&q=80" alt="Preview Check-in" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&auto=format&fit=crop&q=80'" class="w-full h-full object-cover">
+            
+            <!-- Floating Vibe Generator Button -->
+            <div class="absolute bottom-2 right-2">
+              <button type="button" id="btn-vibe-gen" onclick="generateVibeReview()" class="brutal-btn px-2.5 py-1 bg-pop-purple hover:bg-purple-600 text-white rounded-xl text-[11px] font-black border-2 border-pop-dark shadow-brutal flex items-center gap-1">
+                <i class="fa-solid fa-sparkles text-pop-yellow"></i>
+                <span>Gợi Ý Vibe</span>
+              </button>
+            </div>
+          </div>
+          
+          <input type="hidden" id="input-image-url" value="https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&auto=format&fit=crop&q=80">
+        </div>
+
+        <!-- 2. Real-time GPS Geolocation Section -->
+        <div class="p-2.5 bg-amber-50 rounded-xl border-2 border-pop-dark space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-black uppercase text-pop-dark tracking-wide flex items-center gap-1">
+              <i class="fa-solid fa-satellite text-pop-red"></i>
+              <span>2. Toạ Độ GPS Vệ Tinh</span>
+            </label>
+            
+            <button type="button" id="btn-get-gps" onclick="getGPSLocation()" class="brutal-btn px-2 py-1 bg-pop-green hover:bg-emerald-600 text-white text-[10px] font-black rounded-lg flex items-center gap-1 shadow-brutal-sm">
+              <i class="fa-solid fa-location-crosshairs"></i>
+              <span>Lấy Vị Trí Hiện Tại</span>
+            </button>
+          </div>
+
+          <div id="gps-status-box" class="flex items-center justify-between text-[10px] font-mono font-bold bg-white px-2 py-1.5 rounded-lg border border-slate-300 truncate">
+            <span id="gps-status-text" class="text-slate-600 truncate flex items-center gap-1">
+              <i class="fa-solid fa-circle-dot text-amber-500"></i>
+              <span>Chưa lấy GPS (bấm nút để tự động ghim vị trí thật)</span>
+            </span>
+          </div>
+
+          <input type="hidden" id="input-gps-lat" value="">
+          <input type="hidden" id="input-gps-lng" value="">
+        </div>
+
+        <!-- 3. Location Name & District -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-black uppercase text-pop-dark mb-1">
+              3. Tên Địa Điểm / Món Ăn <span class="text-pop-red">*</span>
+            </label>
+            <input type="text" id="input-location-name" required placeholder="VD: Cà phê Vợt Ba Lù, Chùa Bà..." class="w-full px-3 py-1.5 bg-white rounded-xl border-2 border-pop-dark focus:outline-none focus:bg-pop-yellow-light text-xs font-bold">
+          </div>
+
+          <div>
+            <label class="block text-xs font-black uppercase text-pop-dark mb-1">
+              4. Quận / Khu Vực <span class="text-pop-red">*</span>
+            </label>
+            <select id="input-district" required class="w-full px-3 py-1.5 bg-white rounded-xl border-2 border-pop-dark focus:outline-none focus:bg-pop-yellow-light text-xs font-bold">
+              <option value="Quận 1">Quận 1 (Trung Tâm & Bến Nghé)</option>
+              <option value="Quận 3">Quận 3 (Hồ Con Rùa & Biệt Thự Cổ)</option>
+              <option value="Quận 5">Quận 5 (Chợ Lớn Phố Người Hoa)</option>
+              <option value="Quận 6">Quận 6 (Hậu Giang & Bình Tây)</option>
+              <option value="Quận 4">Quận 4 (Phố Ốc Vĩnh Khánh)</option>
+              <option value="Quận 10">Quận 10 (Sư Vạn Hạnh & Hồ Thị Kỷ)</option>
+              <option value="Quận Phú Nhuận">Quận Phú Nhuận (Phan Xích Long)</option>
+              <option value="Quận Bình Thạnh">Quận Bình Thạnh (Hẻm D2 & Thanh Đa)</option>
+              <option value="TP. Thủ Đức">TP. Thủ Đức (Thảo Điền & Landmark)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 4. Address & Category -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-black uppercase text-pop-dark mb-1">
+              5. Địa Chỉ Chi Tiết
+            </label>
+            <input type="text" id="input-address" placeholder="Số nhà, tên đường..." class="w-full px-3 py-1.5 bg-white rounded-xl border-2 border-pop-dark focus:outline-none focus:bg-pop-yellow-light text-xs font-semibold">
+          </div>
+
+          <div>
+            <label class="block text-xs font-black uppercase text-pop-dark mb-1">
+              6. Bộ Sưu Tập Sài Gòn <span class="text-pop-red">*</span>
+            </label>
+            <select id="input-category" required class="w-full px-3 py-1.5 bg-white rounded-xl border-2 border-pop-dark focus:outline-none focus:bg-pop-yellow-light text-xs font-bold">
+              <option value="Góc Phố Cà Phê">☕ Góc Phố Cà Phê</option>
+              <option value="Vibe Chợ Lớn (Khu Người Hoa)">🏮 Vibe Chợ Lớn (Khu Người Hoa)</option>
+              <option value="Chùa Chiền & Tâm Linh">⛩️ Chùa Chiền & Tâm Linh</option>
+              <option value="Sài Gòn Đêm & Món Đường Phố">🍢 Sài Gòn Đêm & Món Đường Phố</option>
+              <option value="Chợ Sài Gòn & Di Sản">🏛️ Chợ Sài Gòn & Di Sản</option>
+              <option value="Mua Sắm & Thrift">🛍️ Mua Sắm & Thrift</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 5. Date & Custom Stamp Badge -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-black uppercase text-pop-dark mb-1">
+              7. Ngày Check-in
+            </label>
+            <input type="date" id="input-date" required class="w-full px-3 py-1.5 bg-white rounded-xl border-2 border-pop-dark focus:outline-none focus:bg-pop-yellow-light text-xs font-bold font-mono">
+          </div>
+
+          <div>
+            <label class="block text-xs font-black uppercase text-pop-dark mb-1">
+              8. Con Dấu Số (Stamp Badge)
+            </label>
+            <input type="text" id="input-stamp-badge" placeholder="VD: Cà Phê Vợt ☕" class="w-full px-3 py-1.5 bg-white rounded-xl border-2 border-pop-dark focus:outline-none focus:bg-pop-yellow-light text-xs font-bold">
+          </div>
+        </div>
+
+        <!-- 6. Star Rating & User Notes -->
+        <div class="space-y-2.5">
+          <div class="p-3 bg-white rounded-xl border-2 border-pop-dark space-y-2.5">
+            <div class="flex items-center justify-between flex-wrap gap-1.5">
+              <label class="block text-xs font-black uppercase text-pop-dark flex items-center gap-1.5">
+                <i class="fa-solid fa-star text-amber-500"></i>
+                <span>9. Chấm Điểm Vibe (Star Rating)</span>
+                <span class="text-pop-red">*</span>
+              </label>
+              <span id="star-rating-label" class="text-xs font-black text-pop-purple bg-purple-50 px-2.5 py-1 rounded-lg border-2 border-pop-purple flex items-center gap-1">
+                5.0 / 5.0 ⭐⭐⭐⭐⭐ (Cực Phẩm Sài Gòn ☕)
+              </span>
+            </div>
+            
+            <!-- Interactive Stars & Rating Levels -->
+            <div class="space-y-2">
+              <div class="flex items-center justify-between p-2 bg-amber-50/80 rounded-xl border-2 border-amber-300">
+                <div class="flex items-center gap-1 sm:gap-2" id="star-rating-picker">
+                  <button type="button" data-star-val="1" class="star-btn text-2xl sm:text-3xl text-amber-400 hover:scale-125 transition cursor-pointer px-1 py-0.5" onclick="setStarRating(1)" onmouseenter="previewStars(1)" onmouseleave="resetStarsPreview()" title="1 Sao - Chưa Ưng Ý">★</button>
+                  <button type="button" data-star-val="2" class="star-btn text-2xl sm:text-3xl text-amber-400 hover:scale-125 transition cursor-pointer px-1 py-0.5" onclick="setStarRating(2)" onmouseenter="previewStars(2)" onmouseleave="resetStarsPreview()" title="2 Sao - Tàm Tạm">★</button>
+                  <button type="button" data-star-val="3" class="star-btn text-2xl sm:text-3xl text-amber-400 hover:scale-125 transition cursor-pointer px-1 py-0.5" onclick="setStarRating(3)" onmouseenter="previewStars(3)" onmouseleave="resetStarsPreview()" title="3 Sao - Ổn Áp Đổi Gió">★</button>
+                  <button type="button" data-star-val="4" class="star-btn text-2xl sm:text-3xl text-amber-400 hover:scale-125 transition cursor-pointer px-1 py-0.5" onclick="setStarRating(4)" onmouseenter="previewStars(4)" onmouseleave="resetStarsPreview()" title="4 Sao - Rất Đỉnh">★</button>
+                  <button type="button" data-star-val="5" class="star-btn text-2xl sm:text-3xl text-amber-400 hover:scale-125 transition cursor-pointer px-1 py-0.5" onclick="setStarRating(5)" onmouseenter="previewStars(5)" onmouseleave="resetStarsPreview()" title="5 Sao - Cực Phẩm">★</button>
+                </div>
+                <div class="text-[11px] font-mono font-bold text-amber-800 bg-amber-200/70 px-2 py-1 rounded-md">
+                  Chạm sao để chọn
+                </div>
+              </div>
+
+              <!-- Quick Level Chips: Full range from 1 to 5 stars -->
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="text-[10px] font-black uppercase text-slate-500 mr-0.5">Mức điểm:</span>
+                <button type="button" data-chip-stars="5" onclick="setStarRating(5)" class="vibe-tag-chip px-2 py-1 bg-pop-yellow text-pop-dark rounded-lg text-[11px] font-black border-2 border-pop-dark shadow-xs transition hover:scale-105">5★ Cực Phẩm ☕</button>
+                <button type="button" data-chip-stars="4" onclick="setStarRating(4)" class="vibe-tag-chip px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-[11px] font-bold border-2 border-slate-300 shadow-xs transition hover:scale-105">4★ Rất Đỉnh 🥢</button>
+                <button type="button" data-chip-stars="3" onclick="setStarRating(3)" class="vibe-tag-chip px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-[11px] font-bold border-2 border-slate-300 shadow-xs transition hover:scale-105">3★ Ổn Áp 🍵</button>
+                <button type="button" data-chip-stars="2" onclick="setStarRating(2)" class="vibe-tag-chip px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-[11px] font-bold border-2 border-slate-300 shadow-xs transition hover:scale-105">2★ Tàm Tạm 🛵</button>
+                <button type="button" data-chip-stars="1" onclick="setStarRating(1)" class="vibe-tag-chip px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-[11px] font-bold border-2 border-slate-300 shadow-xs transition hover:scale-105">1★ Chưa Ưng ❌</button>
+                <button type="button" data-chip-stars="4.8" onclick="handleVibePresetChange('4.8 ⭐⭐⭐⭐⭐ Chuẩn Vị Chợ Lớn 🏮', 4.8)" class="vibe-tag-chip px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-[11px] font-bold border-2 border-slate-300 shadow-xs transition hover:scale-105">4.8★ Chợ Lớn 🏮</button>
+                <button type="button" data-chip-stars="4.5" onclick="handleVibePresetChange('4.5 ⭐⭐⭐⭐½ Chuẩn Gu Streetwear 👟', 4.5)" class="vibe-tag-chip px-2 py-1 bg-white hover:bg-slate-100 text-slate-700 rounded-lg text-[11px] font-bold border-2 border-slate-300 shadow-xs transition hover:scale-105">4.5★ Chuẩn Gu 👟</button>
+              </div>
+            </div>
+
+            <input type="hidden" id="input-vibe-score" value="5.0 ⭐⭐⭐⭐⭐ Cực Phẩm Sài Gòn ☕">
+            <input type="hidden" id="input-vibe-stars" value="5">
+          </div>
+
+          <div>
+            <label class="block text-xs font-black uppercase text-pop-dark mb-1">
+              10. Ký Sự Của Bạn (User Notes)
+            </label>
+            <input type="text" id="input-user-notes" placeholder="Ghi lại cảm nhận, hương vị hoặc kỷ niệm..." class="w-full px-3 py-1.5 bg-white rounded-xl border-2 border-pop-dark focus:outline-none focus:bg-pop-yellow-light text-xs font-semibold">
+          </div>
+        </div>
+
+        <!-- 7. Vibe Review Quote -->
+        <div class="p-2.5 bg-pop-purple-light rounded-xl border-2 border-pop-dark space-y-1">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-black text-pop-purple flex items-center gap-1">
+              <i class="fa-solid fa-quote-left text-pop-purple"></i>
+              <span>11. Cảm Nhận & Lời Bình Vibe Sài Gòn</span>
+            </span>
+            <span class="sticker-tag bg-pop-purple text-white text-[9px]">VIBE CHECK</span>
+          </div>
+          <input type="text" id="input-ai-review" placeholder="Bấm 'Gợi Ý Vibe' hoặc tự viết câu đề từ phong cách Sài Gòn..." class="w-full px-3 py-1.5 bg-white text-xs text-pop-dark rounded-lg border-2 border-pop-dark font-mono font-bold">
+        </div>
+
+        <!-- Modal Actions -->
+        <div class="pt-2 flex items-center justify-end gap-2 border-t-2 border-dashed border-pop-dark/20 sticky bottom-0 bg-pop-bg/95 backdrop-blur-xs py-2">
+          <button type="button" onclick="closeCheckinModal()" class="brutal-btn px-4 py-2 bg-white text-slate-700 text-xs font-bold rounded-xl">
+            Hủy
+          </button>
+          <button type="submit" class="brutal-btn px-5 py-2 bg-pop-red hover:bg-red-500 text-white font-black text-xs shadow-brutal flex items-center gap-1.5 rounded-xl">
+            <i class="fa-solid fa-stamp text-pop-yellow"></i>
+            <span>Lưu Ký Ức & Đóng Dấu</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: TẠO LỊCH TRÌNH VI VU MỚI (TRIP PLANNER MODAL) -->
+  <!-- ========================================================================= -->
+  <div id="plan-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 hidden overflow-y-auto">
+    <div class="bg-pop-bg max-w-lg w-full rounded-2xl border-3 border-pop-dark shadow-brutal-xl my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[92vh]">
+      
+      <!-- Modal Header -->
+      <div class="bg-pop-purple p-3 sm:p-4 border-b-2.5 border-pop-dark flex items-center justify-between text-white shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="text-xl sm:text-2xl">🛵</span>
+          <div>
+            <h3 class="font-display font-black text-base sm:text-lg uppercase tracking-tight">TẠO KẾ HOẠCH VI VU SÀI GÒN</h3>
+            <p class="text-[10px] sm:text-[11px] font-bold text-amber-200">Lên danh sách điểm đến & ước tính chi phí</p>
+          </div>
+        </div>
+        <button type="button" onclick="closePlanModal()" class="w-8 h-8 rounded-xl bg-white hover:bg-slate-100 border-2 border-pop-dark text-pop-dark flex items-center justify-center transition font-bold shadow-brutal-sm">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Plan Form -->
+      <form id="plan-form" onsubmit="handlePlanSubmit(event)" class="p-3.5 sm:p-4 space-y-3 overflow-y-auto flex-1">
+        
+        <!-- Trip Name -->
+        <div>
+          <label class="block text-xs font-black uppercase text-pop-dark mb-1">
+            1. Tên Chuyến Đi <span class="text-pop-red">*</span>
+          </label>
+          <input type="text" id="input-plan-name" required placeholder="VD: Foodtour Chợ Lớn Cuối Tuần 🛵, Dạo Cà Phê Bệt Sáng Sớm..." class="w-full px-3 py-1.5 bg-white rounded-xl border-2 border-pop-dark focus:outline-none focus:bg-pop-yellow-light text-xs font-bold">
+        </div>
+
+        <!-- Date/Time & Status -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-black uppercase text-pop-dark mb-1">
+              2. Ngày / Thời Gian Vi Vu <span class="text-pop-red">*</span>
+            </label>
+            <input type="date" id="input-plan-date" required class="w-full px-3 py-1.5 bg-white rounded-xl border-2 border-pop-dark focus:outline-none focus:bg-pop-yellow-light text-xs font-bold font-mono">
+          </div>
+
+          <div>
+            <label class="block text-xs font-black uppercase text-pop-dark mb-1">
+              3. Trạng Thái Chuyến Đi
+            </label>
+            <select id="input-plan-status" class="w-full px-3 py-1.5 bg-white rounded-xl border-2 border-pop-dark focus:outline-none focus:bg-pop-yellow-light text-xs font-bold">
+              <option value="Sắp Đi ⏳">Sắp Đi ⏳</option>
+              <option value="Đang Vi Vu 🛵">Đang Vi Vu 🛵</option>
+              <option value="Đã Hoàn Thành ✅">Đã Hoàn Thành ✅</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Budget & District -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-black uppercase text-pop-dark mb-1">
+              4. Ước Tính Ngân Sách (VNĐ)
+            </label>
+            <input type="text" id="input-plan-budget" placeholder="VD: 150.000đ / người" class="w-full px-3 py-1.5 bg-white rounded-xl border-2 border-pop-dark focus:outline-none focus:bg-pop-yellow-light text-xs font-bold">
+          </div>
+
+          <div>
+            <label class="block text-xs font-black uppercase text-pop-dark mb-1">
+              5. Khu Vực Trọng Tâm
+            </label>
+            <select id="input-plan-district" class="w-full px-3 py-1.5 bg-white rounded-xl border-2 border-pop-dark focus:outline-none focus:bg-pop-yellow-light text-xs font-bold">
+              <option value="Quận 5 & Quận 6 (Chợ Lớn)">Quận 5 & Quận 6 (Chợ Lớn)</option>
+              <option value="Quận 1 (Trung Tâm & Bến Nghé)">Quận 1 (Trung Tâm & Bến Nghé)</option>
+              <option value="Quận 3 (Hồ Con Rùa)">Quận 3 (Hồ Con Rùa)</option>
+              <option value="Quận 4 (Phố Ốc Vĩnh Khánh)">Quận 4 (Phố Ốc Vĩnh Khánh)</option>
+              <option value="Quận Bình Thạnh & Phú Nhuận">Quận Bình Thạnh & Phú Nhuận</option>
+              <option value="TP. Thủ Đức (Thảo Điền)">TP. Thủ Đức (Thảo Điền)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Quick Spot Select / Textarea -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-black uppercase text-pop-dark">
+              6. Danh Sách Điểm Dừng Chân <span class="text-pop-red">*</span>
+            </label>
+            <span class="text-[10px] text-slate-500 font-bold">Chọn nhanh hoặc gõ tay</span>
+          </div>
+
+          <!-- Quick click spot badges -->
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <button type="button" onclick="addSpotToPlan('The New Playground (Lý Tự Trọng Q1)')" class="text-[10px] font-bold px-2 py-0.5 rounded-lg border border-pop-dark bg-white hover:bg-pop-yellow text-slate-700 transition">
+              + The New Playground
+            </button>
+            <button type="button" onclick="addSpotToPlan('Phố Thời Trang Nguyễn Trãi Q5')" class="text-[10px] font-bold px-2 py-0.5 rounded-lg border border-pop-dark bg-white hover:bg-pop-yellow text-slate-700 transition">
+              + Phố Nguyễn Trãi
+            </button>
+            <button type="button" onclick="addSpotToPlan('Phố Thrift Trần Quang Diệu Q3')" class="text-[10px] font-bold px-2 py-0.5 rounded-lg border border-pop-dark bg-white hover:bg-pop-yellow text-slate-700 transition">
+              + Thrift Trần Quang Diệu
+            </button>
+            <button type="button" onclick="addSpotToPlan('Hẻm Thrift Chợ Bà Chiểu')" class="text-[10px] font-bold px-2 py-0.5 rounded-lg border border-pop-dark bg-white hover:bg-pop-yellow text-slate-700 transition">
+              + Si Chợ Bà Chiểu
+            </button>
+            <button type="button" onclick="addSpotToPlan('Cà phê Vợt Ba Lù (Chợ Phùng Hưng)')" class="text-[10px] font-bold px-2 py-0.5 rounded-lg border border-pop-dark bg-white hover:bg-pop-yellow text-slate-700 transition">
+              + Cà phê Vợt Ba Lù
+            </button>
+            <button type="button" onclick="addSpotToPlan('Chùa Bà Thiên Hậu (Nguyễn Trãi)')" class="text-[10px] font-bold px-2 py-0.5 rounded-lg border border-pop-dark bg-white hover:bg-pop-yellow text-slate-700 transition">
+              + Chùa Bà Thiên Hậu
+            </button>
+            <button type="button" onclick="addSpotToPlan('Bưu Điện Thành Phố & Cà phê Bệt')" class="text-[10px] font-bold px-2 py-0.5 rounded-lg border border-pop-dark bg-white hover:bg-pop-yellow text-slate-700 transition">
+              + Bưu Điện TP & Bệt
+            </button>
+            <button type="button" onclick="addSpotToPlan('Ốc Đêm Vĩnh Khánh Q4')" class="text-[10px] font-bold px-2 py-0.5 rounded-lg border border-pop-dark bg-white hover:bg-pop-yellow text-slate-700 transition">
+              + Ốc Đêm Vĩnh Khánh
+            </button>
+          </div>
+
+          <textarea id="input-plan-spots" rows="3" required placeholder="Ghi các điểm dừng (mỗi điểm 1 dòng hoặc cách nhau bởi dấu phẩy)&#10;VD:&#10;1. Cà phê Vợt Ba Lù&#10;2. Chùa Bà Thiên Hậu&#10;3. Sủi cảo Hà Tôn Quyền" class="w-full px-3 py-1.5 bg-white rounded-xl border-2 border-pop-dark focus:outline-none focus:bg-pop-yellow-light text-xs font-semibold"></textarea>
+        </div>
+
+        <!-- Notes / Tips -->
+        <div>
+          <label class="block text-xs font-black uppercase text-pop-dark mb-1">
+            7. Lưu Ý / Ghi Chú Riêng (Tips, cạ cứng đi cùng)
+          </label>
+          <input type="text" id="input-plan-notes" placeholder="VD: Đi lúc 7h sáng để vắng người, mang theo máy ảnh film..." class="w-full px-3 py-1.5 bg-white rounded-xl border-2 border-pop-dark focus:outline-none focus:bg-pop-yellow-light text-xs font-semibold">
+        </div>
+
+        <!-- Actions -->
+        <div class="pt-2 flex items-center justify-end gap-2 border-t-2 border-dashed border-pop-dark/20 sticky bottom-0 bg-pop-bg/95 backdrop-blur-xs py-2">
+          <button type="button" onclick="closePlanModal()" class="brutal-btn px-4 py-2 bg-white text-slate-700 text-xs font-bold rounded-xl">
+            Hủy
+          </button>
+          <button type="submit" class="brutal-btn px-5 py-2 bg-pop-purple hover:bg-purple-600 text-white font-black text-xs shadow-brutal flex items-center gap-1.5 rounded-xl">
+            <i class="fa-solid fa-map-location-dot text-pop-yellow"></i>
+            <span>Lưu Lịch Trình</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: QUẺ CÀ PHÊ SÀI GÒN (FORTUNE COOKIE & RECOMMENDATIONS) -->
+  <!-- ========================================================================= -->
+  <div id="fortune-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-pop-bg max-w-sm w-full rounded-2xl border-3 border-pop-dark shadow-brutal-xl p-5 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+      
+      <div class="flex items-center justify-between border-b-2 border-pop-dark pb-2">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">🥠</span>
+          <div>
+            <h3 class="font-display font-black text-base text-pop-dark uppercase">QUẺ CÀ PHÊ SÀI GÒN</h3>
+            <p class="text-[10px] font-bold text-slate-500">Hôm nay vũ trụ bảo bạn đi đâu?</p>
+          </div>
+        </div>
+        <button onclick="closeFortuneModal()" class="w-7 h-7 rounded-lg bg-white border-2 border-pop-dark text-pop-dark flex items-center justify-center text-xs font-bold">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Mood Selector (Sáng, Chiều, Tối) -->
+      <div class="flex items-center justify-between bg-white p-1.5 rounded-xl border-2 border-pop-dark">
+        <button onclick="pickFortuneByMood('morning')" class="fortune-mood-btn flex-1 py-1 text-[11px] font-black rounded-lg bg-pop-yellow border border-pop-dark text-pop-dark" data-mood="morning">
+          ☕ Sáng
+        </button>
+        <button onclick="pickFortuneByMood('afternoon')" class="fortune-mood-btn flex-1 py-1 text-[11px] font-bold rounded-lg text-slate-600 hover:text-pop-dark" data-mood="afternoon">
+          🌇 Chiều
+        </button>
+        <button onclick="pickFortuneByMood('night')" class="fortune-mood-btn flex-1 py-1 text-[11px] font-bold rounded-lg text-slate-600 hover:text-pop-dark" data-mood="night">
+          🌙 Tối
+        </button>
+      </div>
+
+      <!-- Fortune Card Display -->
+      <div class="p-4 bg-white rounded-xl border-2.5 border-pop-dark shadow-brutal space-y-2.5 text-center">
+        <div id="fortune-icon" class="text-4xl">🥤</div>
+        <div>
+          <span id="fortune-tag" class="sticker-tag bg-pop-pink text-white text-[9px] mb-1">GÓC PHỐ CÀ PHÊ</span>
+          <h4 id="fortune-title" class="font-display font-black text-base text-pop-dark">Cà Phê Bệt Nhà Thờ Đức Bà</h4>
+          <p id="fortune-district" class="text-xs font-mono font-bold text-pop-red">📍 Công xã Paris, Quận 1</p>
+        </div>
+        <div class="p-2.5 bg-amber-50 rounded-lg border border-dashed border-pop-dark/40 text-xs font-semibold text-slate-700 italic">
+          "<span id="fortune-quote">Uống một ly cà phê sữa đá, ngắm bồ câu bay thảnh thơi giữa sớm mai Sài Gòn.</span>"
+        </div>
+      </div>
+
+      <!-- Fortune Actions -->
+      <div class="space-y-2 pt-1">
+        <button onclick="rollRandomFortune()" class="w-full brutal-btn py-2 bg-pop-yellow hover:bg-pop-yellow-light text-pop-dark rounded-xl font-black text-xs flex items-center justify-center gap-1.5 shadow-brutal">
+          <i class="fa-solid fa-dice text-sm"></i>
+          <span>LẮC QUẺ KHÁC 🎲</span>
+        </button>
+        
+        <button onclick="applyFortuneToCheckin()" class="w-full brutal-btn py-2 bg-pop-green hover:bg-emerald-600 text-white rounded-xl font-black text-xs flex items-center justify-center gap-1.5 shadow-brutal">
+          <i class="fa-solid fa-location-dot"></i>
+          <span>CHECK-IN ĐIỂM NÀY NGAY 📍</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Toast Notification Alert -->
+  <div id="toast-msg" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-pop-dark text-white px-4 py-2 rounded-xl border-2 border-pop-yellow font-display font-black text-xs shadow-brutal transition-all duration-300 opacity-0 pointer-events-none transform -translate-y-4">
+    🎉 Thông báo
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL: XÁC NHẬN (CUSTOM BRUTALIST CONFIRM DIALOG - HOẠT ĐỘNG HOÀN HẢO TRÊN IFRAME) -->
+  <!-- ========================================================================= -->
+  <div id="confirm-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white max-w-sm w-full rounded-2xl border-3 border-pop-dark shadow-brutal-xl p-5 space-y-4 animate-in fade-in zoom-in-95 duration-200">
+      <div class="flex items-center gap-3">
+        <div id="confirm-icon-box" class="w-11 h-11 rounded-xl bg-red-100 border-2 border-pop-dark flex items-center justify-center text-xl text-pop-red shrink-0 shadow-brutal-sm">
+          <i class="fa-solid fa-trash-can"></i>
+        </div>
+        <div>
+          <h3 id="confirm-modal-title" class="font-display font-black text-base text-pop-dark">Xác Nhận Thao Tác</h3>
+          <p id="confirm-modal-desc" class="text-xs font-bold text-slate-600">Bạn có chắc chắn muốn thực hiện hành động này?</p>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t-2 border-dashed border-pop-dark/20">
+        <button type="button" onclick="closeConfirmModal()" class="brutal-btn px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl">
+          Hủy bỏ
+        </button>
+        <button id="confirm-modal-btn" type="button" onclick="executeConfirmAction()" class="brutal-btn px-4 py-2 bg-pop-red hover:bg-red-500 text-white text-xs font-black rounded-xl shadow-brutal flex items-center gap-1.5">
+          <i class="fa-solid fa-check"></i>
+          <span id="confirm-btn-text">Đồng ý</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT: LOCAL AUTH, STATE, LEAFLET MAP & APP ENGINE -->
+  <!-- ========================================================================= -->
+  <script>
+    // Custom Confirm Dialog State
+    let pendingConfirmCallback = null;
+
+    function showConfirmDialog({ title, message, confirmText = 'Đồng ý', isDanger = true, onConfirm }) {
+      const modal = document.getElementById('confirm-modal');
+      const titleEl = document.getElementById('confirm-modal-title');
+      const descEl = document.getElementById('confirm-modal-desc');
+      const btnTextEl = document.getElementById('confirm-btn-text');
+      const iconBox = document.getElementById('confirm-icon-box');
+      const confirmBtn = document.getElementById('confirm-modal-btn');
+
+      if (titleEl) titleEl.textContent = title || 'Xác Nhận';
+      if (descEl) descEl.textContent = message || 'Bạn có chắc chắn muốn tiếp tục?';
+      if (btnTextEl) btnTextEl.textContent = confirmText;
+
+      if (isDanger) {
+        if (iconBox) {
+          iconBox.className = "w-11 h-11 rounded-xl bg-red-100 border-2 border-pop-dark flex items-center justify-center text-xl text-pop-red shrink-0 shadow-brutal-sm";
+          iconBox.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+        }
+        if (confirmBtn) {
+          confirmBtn.className = "brutal-btn px-4 py-2 bg-pop-red hover:bg-red-500 text-white text-xs font-black rounded-xl shadow-brutal flex items-center gap-1.5";
+        }
+      } else {
+        if (iconBox) {
+          iconBox.className = "w-11 h-11 rounded-xl bg-amber-100 border-2 border-pop-dark flex items-center justify-center text-xl text-pop-dark shrink-0 shadow-brutal-sm";
+          iconBox.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i>';
+        }
+        if (confirmBtn) {
+          confirmBtn.className = "brutal-btn px-4 py-2 bg-pop-yellow hover:bg-amber-300 text-pop-dark text-xs font-black rounded-xl shadow-brutal flex items-center gap-1.5";
+        }
+      }
+
+      pendingConfirmCallback = onConfirm;
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      const modal = document.getElementById('confirm-modal');
+      if (modal) modal.classList.add('hidden');
+      pendingConfirmCallback = null;
+    }
+
+    function executeConfirmAction() {
+      if (typeof pendingConfirmCallback === 'function') {
+        const cb = pendingConfirmCallback;
+        closeConfirmModal();
+        cb();
+      } else {
+        closeConfirmModal();
+      }
+    }
+
+    // ==========================================
+    // 1. AUTHENTIC REAL LANDMARK SEED DATA & TRIP PLANS
+    // ==========================================
+    const DEFAULT_SEED_DATA = [
+      {
+        id: 'sg-seed-1',
+        name: 'The New Playground',
+        district: 'Quận 1',
+        address: '26 Lý Tự Trọng, Phường Bến Nghé, Quận 1',
+        category: 'Mua Sắm & Thrift',
+        date: '2026-08-22',
+        imageUrl: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=800&auto=format&fit=crop&q=80',
+        stampBadge: 'Trùm Local Brand 👟',
+        vibeScore: '5.0 ⭐⭐⭐⭐⭐ Cực Cháy Phố 👟',
+        userNotes: 'Tổ hợp underground thời trang ngay trung tâm Quận 1, quy tụ toàn local brand xịn của giới trẻ.',
+        aiReview: 'Thiên đường streetwear dưới lòng đất, outfit nào cũng chất lừ lên hình bao cháy.',
+        coords: [10.7765, 106.7008],
+        isFavorite: true,
+      },
+      {
+        id: 'sg-seed-2',
+        name: 'Phố Thời Trang Nguyễn Trãi',
+        district: 'Quận 5',
+        address: 'Đường Nguyễn Trãi, Phường 2, Quận 5',
+        category: 'Mua Sắm & Thrift',
+        date: '2026-08-21',
+        imageUrl: 'https://images.unsplash.com/photo-1519567241046-7f570eee3ce6?w=800&auto=format&fit=crop&q=80',
+        stampBadge: 'Thánh Săn Đồ 🛍️',
+        vibeScore: '4.8 ⭐⭐⭐⭐⭐ Săn Đồ Mê Xỉu 🛍️',
+        userNotes: 'Con đường thời trang sầm uất thâu đêm từ Quận 5 sang Quận 1, ghé hẻm lựa đồ si mê xỉu.',
+        aiReview: 'Phố shopping không ngủ của giới trẻ, bước chân vô là xác định rỗng ví vì quá nhiều đồ đẹp.',
+        coords: [10.7578, 106.6781],
+        isFavorite: true,
+      },
+      {
+        id: 'sg-seed-3',
+        name: 'Phố Đồ Thrift & Vintage Trần Quang Diệu',
+        district: 'Quận 3',
+        address: 'Đường Trần Quang Diệu, Phường 14, Quận 3',
+        category: 'Mua Sắm & Thrift',
+        date: '2026-08-19',
+        imageUrl: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&auto=format&fit=crop&q=80',
+        stampBadge: 'Trùm Secondhand 🧥',
+        vibeScore: '4.5 ⭐⭐⭐⭐½ Chuẩn Gu Vintage 🧥',
+        userNotes: 'Thiên đường đồ si tuyển chọn, chịu khó lùng là rinh được mấy em sơ mi vintage độc bản.',
+        aiReview: 'Góc phố vintage yên bình, nơi mỗi chiếc áo cũ đều mang một câu chuyện độc bản.',
+        coords: [10.7865, 106.6772],
+        isFavorite: false,
+      },
+      {
+        id: 'sg-seed-4',
+        name: 'Hẻm Vintage & Thrift Chợ Bà Chiểu',
+        district: 'Quận Bình Thạnh',
+        address: 'Chợ Bà Chiểu, Bạch Đằng, Phường 1, Bình Thạnh',
+        category: 'Mua Sắm & Thrift',
+        date: '2026-08-17',
+        imageUrl: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=800&auto=format&fit=crop&q=80',
+        stampBadge: 'Săn Đồ 2Hand 🏷️',
+        vibeScore: '4.0 ⭐⭐⭐⭐ Đậm Vị Bình Dân 🏷️',
+        userNotes: 'Khu chợ đồ si huyền thoại của sinh viên, bới đồ vừa vui vừa gom được cả đống đồ hiệu giá 50k.',
+        aiReview: 'Thiên đường đồ si bình dân, kiên nhẫn bới tìm là có ngay siêu phẩm giá hạt dẻ.',
+        coords: [10.8012, 106.6985],
+        isFavorite: true,
+      },
+      {
+        id: 'sg-seed-5',
+        name: 'Cà phê Vợt Ba Lù',
+        district: 'Quận 5',
+        address: 'Chợ Phùng Hưng, Phường 14, Quận 5',
+        category: 'Góc Phố Cà Phê',
+        date: '2026-08-20',
+        imageUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&auto=format&fit=crop&q=80',
+        stampBadge: 'Cà Phê Vợt Ba Lù ☕',
+        vibeScore: '5.0 ⭐⭐⭐⭐⭐ Cực Phẩm Cà Phê ☕',
+        userNotes: 'Quán cà phê vợt người Hoa rang củi gia truyền hơn 70 năm, thơm nức mũi cả góc chợ Phùng Hưng.',
+        aiReview: 'Ngồi ghế đẩu làm ly cà phê vợt thơm mùi bơ khói, nghe cô chú Chợ Lớn rôm rả chuyện đời.',
+        coords: [10.7544, 106.6578],
+        isFavorite: true,
+      },
+      {
+        id: 'sg-seed-6',
+        name: 'Chùa Bà Thiên Hậu',
+        district: 'Quận 5',
+        address: '710 Nguyễn Trãi, Phường 11, Quận 5',
+        category: 'Chùa Chiền & Tâm Linh',
+        date: '2026-08-18',
+        imageUrl: 'https://images.unsplash.com/photo-1563822249548-9a72b6353cd1?w=800&auto=format&fit=crop&q=80',
+        stampBadge: 'Chùa Bà Thiên Hậu 🏮',
+        vibeScore: '5.0 ⭐⭐⭐⭐⭐ An Yên Thanh Tịnh 🏮',
+        userNotes: 'Nhang vòng treo kín trần chùa cổ kính, viết tên cầu bình an may mắn giữa lòng Chợ Lớn.',
+        aiReview: 'Nhang vòng cuộn khói an yên giữa mái chùa cổ, bước vô là thấy lòng nhẹ nhõm liền.',
+        coords: [10.7533, 106.6599],
+        isFavorite: true,
+      },
+      {
+        id: 'sg-seed-7',
+        name: 'Bưu Điện Trung Tâm Thành Phố',
+        district: 'Quận 1',
+        address: '02 Công Xã Paris, Phường Bến Nghé, Quận 1',
+        category: 'Chợ Sài Gòn & Di Sản',
+        date: '2026-08-15',
+        imageUrl: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&auto=format&fit=crop&q=80',
+        stampBadge: 'Bưu Điện Thành Phố 📬',
+        vibeScore: '4.8 ⭐⭐⭐⭐⭐ Check-in Quốc Dân 🏛️',
+        userNotes: 'Kiến trúc mái vòm cổ điển tuyệt đẹp, ngồi cà phê bệt kế bên ngắm bồ câu bay thảnh thơi.',
+        aiReview: 'Kiến trúc trăm năm góc nào lên hình cũng đỉnh, cảm nhận trọn vẹn nét hào sảng Sài Gòn.',
+        coords: [10.7798, 106.6999],
+        isFavorite: false,
+      },
+      {
+        id: 'sg-seed-8',
+        name: 'Phố Ốc Đêm Vĩnh Khánh',
+        district: 'Quận 4',
+        address: 'Đường Vĩnh Khánh, Phường 8, Quận 4',
+        category: 'Sài Gòn Đêm & Món Đường Phố',
+        date: '2026-08-12',
+        imageUrl: 'https://images.unsplash.com/photo-1555126634-323283e090fa?w=800&auto=format&fit=crop&q=80',
+        stampBadge: 'Ốc Đêm Vĩnh Khánh 🦪',
+        vibeScore: '4.7 ⭐⭐⭐⭐⭐ Xôm Tụ Tới Sáng 🦪',
+        userNotes: 'Ốc hương rang muối tuyết, sò điệp mỡ hành nướng than thơm lừng cả con phố không ngủ.',
+        aiReview: 'Mùi ốc nướng mỡ hành nức mũi, kéo cạ cứng ra nhâm nhi tán gẫu thâu đêm là chuẩn bài.',
+        coords: [10.7602, 106.7035],
+        isFavorite: true,
+      }
+    ];
+
+    // Seed Data for Trip Planner
+    const DEFAULT_SEED_PLANS = [
+      {
+        id: 'plan-1',
+        name: 'Săn Đồ Thrift & Local Brand Cuối Tuần 🛍️',
+        date: '2026-08-30',
+        district: 'Quận 1 & Quận 3 (Thời Trang)',
+        budget: '250.000đ / người',
+        status: 'Sắp Đi ⏳',
+        spots: [
+          { name: 'The New Playground (Lý Tự Trọng Q1)', category: 'Mua Sắm & Thrift', checked: false },
+          { name: 'Phố Thrift Trần Quang Diệu Q3', category: 'Mua Sắm & Thrift', checked: false },
+          { name: 'Hẻm Vintage & Thrift Chợ Bà Chiểu', category: 'Mua Sắm & Thrift', checked: false }
+        ],
+        notes: 'Đi lúc chiều mát để tha hồ thử đồ, chuẩn bị sẵn mắt nhìn để rinh đồ 2hand xịn!'
+      },
+      {
+        id: 'plan-2',
+        name: 'Foodtour Chợ Lớn Cuối Tuần 🛵',
+        date: '2026-08-29',
+        district: 'Quận 5 & Quận 6 (Chợ Lớn)',
+        budget: '180.000đ / người',
+        status: 'Sắp Đi ⏳',
+        spots: [
+          { name: 'Cà phê Vợt Ba Lù (Chợ Phùng Hưng)', category: 'Góc Phố Cà Phê', checked: false },
+          { name: 'Chùa Bà Thiên Hậu (Nguyễn Trãi)', category: 'Chùa Chiền & Tâm Linh', checked: false },
+          { name: 'Hẻm Sủi Cảo Hà Tôn Quyền', category: 'Vibe Chợ Lớn (Khu Người Hoa)', checked: false },
+          { name: 'Bánh Hẹ Lê Quang Sung', category: 'Vibe Chợ Lớn (Khu Người Hoa)', checked: false }
+        ],
+        notes: 'Đi từ 7h30 sáng cho mát mẻ, chuẩn bị sẵn bụng đói để càn quét hết món ngon Chợ Lớn!'
+      },
+      {
+        id: 'plan-3',
+        name: 'Chill Cà Phê & Di Sản Quận 1 ☕',
+        date: '2026-08-25',
+        district: 'Quận 1 (Trung Tâm & Bến Nghé)',
+        budget: '100.000đ / người',
+        status: 'Đang Vi Vu 🛵',
+        spots: [
+          { name: 'Bưu Điện Trung Tâm Thành Phố', category: 'Chợ Sài Gòn & Di Sản', checked: true },
+          { name: 'Cà Phê Bệt Nhà Thờ Đức Bà', category: 'Góc Phố Cà Phê', checked: false },
+          { name: 'Đường Sách Nguyễn Văn Bình', category: 'Chợ Sài Gòn & Di Sản', checked: false }
+        ],
+        notes: 'Mang theo sách đọc thảnh thơi và chụp vài tấm ảnh film kỷ niệm.'
+      }
+    ];
+
+    // Saigon Fortunes Database with authentic, grounded Saigon vibes
+    const SAIGON_FORTUNES = [
+      {
+        mood: 'morning',
+        icon: '☕',
+        title: 'Cà Phê Bệt Nhà Thờ Đức Bà',
+        district: 'Quận 1',
+        category: 'Góc Phố Cà Phê',
+        coords: [10.7797, 106.6990],
+        stamp: 'Cà Phê Bệt 🥤',
+        imageUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&auto=format&fit=crop&q=80',
+        quote: 'Làm ly cà phê sữa đá đậm đà ngồi bệt ngắm bồ câu bay, nghe gió sớm mai mát rượi cả người.'
+      },
+      {
+        mood: 'morning',
+        icon: '🥢',
+        title: 'Bánh Hẹ Lê Quang Sung',
+        district: 'Quận 6',
+        category: 'Vibe Chợ Lớn (Khu Người Hoa)',
+        coords: [10.7485, 106.6492],
+        stamp: 'Bánh Hẹ Chợ Lớn 🥟',
+        imageUrl: 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?w=800&auto=format&fit=crop&q=80',
+        quote: 'Cắn miếng bánh hẹ giòn rụm chấm nước tương giấm ớt chua ngọt, ngon nhức nách ấm bụng sớm mai.'
+      },
+      {
+        mood: 'afternoon',
+        icon: '👟',
+        title: 'The New Playground',
+        district: 'Quận 1',
+        category: 'Mua Sắm & Thrift',
+        coords: [10.7765, 106.7008],
+        stamp: 'Trùm Local Brand 👟',
+        imageUrl: 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=800&auto=format&fit=crop&q=80',
+        quote: 'Rủ cạ cứng xuống hầm quẩy đồ local brand cực cháy, lên outfit độc bản chuẩn phong cách đường phố.'
+      },
+      {
+        mood: 'afternoon',
+        icon: '🧥',
+        title: 'Phố Thrift Trần Quang Diệu',
+        district: 'Quận 3',
+        category: 'Mua Sắm & Thrift',
+        coords: [10.7865, 106.6772],
+        stamp: 'Trùm Secondhand 🧥',
+        imageUrl: 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&auto=format&fit=crop&q=80',
+        quote: 'Chịu khó lội hẻm bới đồ si là rinh được mấy em sơ mi vintage độc bản, giá hạt dẻ mê xỉu.'
+      },
+      {
+        mood: 'afternoon',
+        icon: '🏮',
+        title: 'Hội Quán Nghĩa An (Chùa Ông)',
+        district: 'Quận 5',
+        category: 'Chùa Chiền & Tâm Linh',
+        coords: [10.7548, 106.6620],
+        stamp: 'Hội Quán Chợ Lớn ⛩️',
+        imageUrl: 'https://images.unsplash.com/photo-1563822249548-9a72b6353cd1?w=800&auto=format&fit=crop&q=80',
+        quote: 'Thắp nén nhang trầm thơm dịu, ngắm nét chạm trổ cổ kính thấy lòng bình yên nhẹ nhõm hẳn.'
+      },
+      {
+        mood: 'afternoon',
+        icon: '☕',
+        title: 'Chung Cư 42 Nguyễn Huệ',
+        district: 'Quận 1',
+        category: 'Góc Phố Cà Phê',
+        coords: [10.7744, 106.7032],
+        stamp: 'Cafe Chung Cư 🌆',
+        imageUrl: 'https://images.unsplash.com/photo-1514933651103-005eec06c04b?w=800&auto=format&fit=crop&q=80',
+        quote: 'Leo lên chung cư cổ làm ly trà sữa ngắm phố đi bộ lên đèn rực rỡ, chill hết nấc cùng bạn bè.'
+      },
+      {
+        mood: 'night',
+        icon: '🛍️',
+        title: 'Phố Thời Trang Nguyễn Trãi',
+        district: 'Quận 5',
+        category: 'Mua Sắm & Thrift',
+        coords: [10.7578, 106.6781],
+        stamp: 'Thánh Săn Đồ 🛍️',
+        imageUrl: 'https://images.unsplash.com/photo-1519567241046-7f570eee3ce6?w=800&auto=format&fit=crop&q=80',
+        quote: 'Dạo con phố thời trang nhộn nhịp từ chiều tới khuya, bước chân vô là xác định rỗng ví vì quá nhiều đồ xịn.'
+      },
+      {
+        mood: 'night',
+        icon: '🍢',
+        title: 'Phố Ốc Vĩnh Khánh',
+        district: 'Quận 4',
+        category: 'Sài Gòn Đêm & Món Đường Phố',
+        coords: [10.7602, 106.7035],
+        stamp: 'Ốc Đêm Vĩnh Khánh 🦪',
+        imageUrl: 'https://images.unsplash.com/photo-1555126634-323283e090fa?w=800&auto=format&fit=crop&q=80',
+        quote: 'Dĩa ốc hương xào bơ tỏi thơm lừng, kéo ghế nhựa ngồi nhâm nhi tám chuyện thâu đêm là đúng bài.'
+      },
+      {
+        mood: 'night',
+        icon: '🏛️',
+        title: 'Bưu Điện Trung Tâm Thành Phố',
+        district: 'Quận 1',
+        category: 'Chợ Sài Gòn & Di Sản',
+        coords: [10.7798, 106.6999],
+        stamp: 'Di Sản Sài Gòn 📬',
+        imageUrl: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&auto=format&fit=crop&q=80',
+        quote: 'Kiến trúc cổ kính trăm năm góc nào lên hình cũng đỉnh, ra chụp vài tấm hình film lưu giữ kỷ niệm.'
+      }
+    ];
+
+    // Current State
+    let currentUser = null;
+    let currentAvatar = '🛵';
+    let userEntries = [];
+    let userPlans = [];
+    let activeTab = 'journal';
+    let leafletMap = null;
+    let mapMarkers = [];
+    let currentFortune = SAIGON_FORTUNES[0];
+
+    // ==========================================
+    // 2. INITIALIZATION ON LOAD
+    // ==========================================
+    window.addEventListener('DOMContentLoaded', () => {
+      checkUserAuth();
+      setupDefaultFormDate();
+    });
+
+    function setupDefaultFormDate() {
+      const today = new Date().toISOString().split('T')[0];
+      const dateInput = document.getElementById('input-date');
+      const planDateInput = document.getElementById('input-plan-date');
+      if (dateInput) dateInput.value = today;
+      if (planDateInput) planDateInput.value = today;
+    }
+
+    // ==========================================
+    // 3. AUTHENTICATION, MULTI-USER REGISTRY & ACTIVITY LOGGING
+    // ==========================================
+    const USERS_REGISTRY_KEY = 'sg_passport_users_registry';
+
+    function getAllRegisteredUsers() {
+      try {
+        const data = localStorage.getItem(USERS_REGISTRY_KEY);
+        if (data) {
+          const list = JSON.parse(data);
+          if (Array.isArray(list)) return list;
+        }
+      } catch (e) {
+        console.error('Error loading users registry:', e);
+      }
+      return [];
+    }
+
+    function saveRegisteredUsers(users) {
+      localStorage.setItem(USERS_REGISTRY_KEY, JSON.stringify(users));
+      updateUserCountBadge();
+    }
+
+    function updateUserCountBadge() {
+      const users = getAllRegisteredUsers();
+      const badge = document.getElementById('user-count-badge');
+      if (badge) badge.textContent = users.length;
+    }
+
+    function updateUserStatsInRegistry() {
+      if (!currentUser) return;
+      const users = getAllRegisteredUsers();
+      const idx = users.findIndex(u => u.username.toLowerCase() === currentUser.toLowerCase());
+      const now = new Date().toISOString();
+      const stampCount = userEntries ? userEntries.length : 0;
+      const planCount = userPlans ? userPlans.length : 0;
+
+      if (idx !== -1) {
+        users[idx].avatar = currentAvatar;
+        users[idx].stampCount = stampCount;
+        users[idx].planCount = planCount;
+        users[idx].lastLogin = now;
+      } else {
+        users.push({
+          username: currentUser,
+          avatar: currentAvatar,
+          stampCount,
+          planCount,
+          createdAt: now,
+          lastLogin: now
+        });
+      }
+      saveRegisteredUsers(users);
+    }
+
+    function switchAuthTab(tab) {
+      const registerPanel = document.getElementById('auth-panel-register');
+      const switchPanel = document.getElementById('auth-panel-switch');
+      const registerBtn = document.getElementById('auth-tab-register-btn');
+      const switchBtn = document.getElementById('auth-tab-switch-btn');
+
+      if (tab === 'register') {
+        registerPanel?.classList.remove('hidden');
+        switchPanel?.classList.add('hidden');
+        
+        registerBtn?.classList.add('bg-pop-yellow', 'border-pop-dark', 'text-pop-dark', 'shadow-brutal-sm');
+        registerBtn?.classList.remove('bg-white', 'border-transparent', 'text-slate-700');
+
+        switchBtn?.classList.remove('bg-pop-yellow', 'border-pop-dark', 'text-pop-dark', 'shadow-brutal-sm');
+        switchBtn?.classList.add('bg-white', 'border-transparent', 'text-slate-700');
+      } else {
+        registerPanel?.classList.add('hidden');
+        switchPanel?.classList.remove('hidden');
+
+        switchBtn?.classList.add('bg-pop-yellow', 'border-pop-dark', 'text-pop-dark', 'shadow-brutal-sm');
+        switchBtn?.classList.remove('bg-white', 'border-transparent', 'text-slate-700');
+
+        registerBtn?.classList.remove('bg-pop-yellow', 'border-pop-dark', 'text-pop-dark', 'shadow-brutal-sm');
+        registerBtn?.classList.add('bg-white', 'border-transparent', 'text-slate-700');
+
+        renderAccountsList();
+      }
+    }
+
+    function renderAccountsList() {
+      const container = document.getElementById('auth-accounts-list');
+      if (!container) return;
+
+      const users = getAllRegisteredUsers();
+      updateUserCountBadge();
+
+      if (users.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-6 px-3 bg-slate-50 rounded-xl border-2 border-dashed border-slate-300 space-y-2">
+            <span class="text-3xl">📭</span>
+            <p class="text-xs font-bold text-slate-600">Chưa có Hộ Chiếu nào được lưu trên thiết bị này.</p>
+            <button type="button" onclick="switchAuthTab('register')" class="brutal-btn px-3 py-1.5 bg-pop-red text-white text-xs rounded-lg font-black inline-flex items-center gap-1">
+              <span>+ Tạo Hộ Chiếu Mới Ngay</span>
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = users.map(user => {
+        const isCurrent = currentUser && user.username.toLowerCase() === currentUser.toLowerCase();
+        const safeName = user.username.replace(/'/g, "\\'");
+        
+        return `
+          <div class="p-2.5 rounded-xl border-2 ${isCurrent ? 'border-pop-purple bg-purple-50/70 shadow-brutal-sm' : 'border-pop-dark bg-white'} flex items-center justify-between gap-2 transition hover:bg-amber-50/50">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-10 h-10 rounded-xl bg-pop-yellow border-2 border-pop-dark flex items-center justify-center text-xl shrink-0">
+                ${user.avatar || '🛵'}
+              </div>
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <h4 class="font-display font-black text-xs text-pop-dark uppercase truncate max-w-[150px] sm:max-w-xs">${user.username}</h4>
+                  ${isCurrent ? '<span class="sticker-tag bg-pop-purple text-white text-[8px] py-0 px-1">Đang dùng</span>' : ''}
+                </div>
+                <div class="text-[10px] text-slate-500 font-bold flex items-center gap-2 mt-0.5">
+                  <span>📸 ${user.stampCount || 0} Dấu</span>
+                  <span>•</span>
+                  <span>🗺️ ${user.planCount || 0} Lịch trình</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-1 shrink-0">
+              ${!isCurrent ? `
+                <button type="button" onclick="loginAsUser('${safeName}')" class="brutal-btn px-2.5 py-1 bg-pop-green text-white text-[11px] font-black rounded-lg shadow-xs flex items-center gap-1">
+                  <span>Vào</span>
+                  <i class="fa-solid fa-arrow-right-to-bracket text-[10px]"></i>
+                </button>
+              ` : `
+                <button type="button" onclick="document.getElementById('auth-modal').classList.add('hidden')" class="brutal-btn px-2.5 py-1 bg-pop-dark text-white text-[11px] font-black rounded-lg shadow-xs">
+                  <span>Tiếp tục</span>
+                </button>
+              `}
+              <button type="button" onclick="deleteUserAccount('${safeName}')" class="w-7 h-7 rounded-lg border border-slate-300 hover:border-pop-red hover:bg-red-50 text-slate-400 hover:text-pop-red flex items-center justify-center text-xs" title="Xóa tài khoản này">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function loginAsUser(username) {
+      const users = getAllRegisteredUsers();
+      const found = users.find(u => u.username.toLowerCase() === username.toLowerCase());
+      if (!found) return;
+
+      currentUser = found.username;
+      currentAvatar = found.avatar || '🛵';
+
+      localStorage.setItem('sg_active_user', currentUser);
+      localStorage.setItem('sg_active_avatar', currentAvatar);
+
+      document.getElementById('auth-modal')?.classList.add('hidden');
+      loadUserData();
+      updateHeaderProfile();
+      updateUserStatsInRegistry();
+
+      logUserActivity('login', 'Đăng nhập Hộ Chiếu', `Đã chuyển sang Hộ Chiếu "${currentUser}"`, '🔑');
+      showToastNotification(`🛂 Chào mừng trở lại, ${currentUser}!`);
+    }
+
+    function deleteUserAccount(username) {
+      showConfirmDialog({
+        title: 'Xóa Hộ Chiếu Này? ⚠️',
+        message: `Bạn có chắc muốn xóa vĩnh viễn Hộ Chiếu "${username}" cùng toàn bộ con dấu và kế hoạch? Hành động này không thể hoàn tác!`,
+        confirmText: 'Xóa vĩnh viễn',
+        isDanger: true,
+        onConfirm: () => {
+          let users = getAllRegisteredUsers();
+          users = users.filter(u => u.username.toLowerCase() !== username.toLowerCase());
+          saveRegisteredUsers(users);
+
+          // Clear stored data keys for this user
+          localStorage.removeItem(`sg_passport_data_${username}`);
+          localStorage.removeItem(`sg_passport_plans_${username}`);
+          localStorage.removeItem(`sg_passport_activities_${username}`);
+
+          if (currentUser && currentUser.toLowerCase() === username.toLowerCase()) {
+            localStorage.removeItem('sg_active_user');
+            localStorage.removeItem('sg_active_avatar');
+            currentUser = null;
+            currentAvatar = '🛵';
+            userEntries = [];
+            userPlans = [];
+            openPassportLoginModal();
+          } else {
+            renderAccountsList();
+          }
+          showToastNotification(`🗑️ Đã xóa Hộ Chiếu "${username}"!`);
+        }
+      });
+    }
+
+    function checkUserAuth() {
+      const storedUser = localStorage.getItem('sg_active_user');
+      const storedAvatar = localStorage.getItem('sg_active_avatar') || '🛵';
+
+      updateUserCountBadge();
+
+      if (!storedUser) {
+        openPassportLoginModal();
+      } else {
+        currentUser = storedUser;
+        currentAvatar = storedAvatar;
+        const modal = document.getElementById('auth-modal');
+        if (modal) modal.classList.add('hidden');
+        loadUserData();
+        updateHeaderProfile();
+        updateUserStatsInRegistry();
+      }
+    }
+
+    function openPassportProfile() {
+      openPassportLoginModal();
+    }
+
+    function openPassportLoginModal() {
+      const modal = document.getElementById('auth-modal');
+      if (!modal) return;
+      modal.classList.remove('hidden');
+
+      const nameInput = document.getElementById('auth-username');
+      if (nameInput) {
+        nameInput.value = currentUser || '';
+        updatePassportSignature(currentUser || 'Bắp Cà Phê');
+      }
+      selectAvatar(currentAvatar || '🛵');
+      updateUserCountBadge();
+      switchAuthTab('register');
+    }
+
+    function updatePassportSignature(name) {
+      const sigPreview = document.getElementById('passport-signature-preview');
+      const mrz1 = document.getElementById('mrz-line-1');
+      const noPreview = document.getElementById('passport-number-preview');
+      const displayName = name.trim() || 'Người Du Hành';
+      
+      if (sigPreview) {
+        sigPreview.textContent = displayName;
+      }
+      if (mrz1) {
+        const cleanName = displayName.toUpperCase().replace(/[^A-Z0-9]/g, '<');
+        mrz1.textContent = `P<VNMSAI<GON<${cleanName.slice(0, 15)}<<<<<<<<<<<<<<<<<<`;
+      }
+      if (noPreview) {
+        const hash = Math.abs(displayName.split('').reduce((acc, char) => (acc << 5) - acc + char.charCodeAt(0), 0)) % 9000 + 1000;
+        noPreview.textContent = `SG-2026-${hash}`;
+      }
+    }
+
+    function selectAvatar(emoji) {
+      currentAvatar = emoji;
+      const avatarInput = document.getElementById('auth-selected-avatar');
+      if (avatarInput) avatarInput.value = emoji;
+
+      const photoDisplay = document.getElementById('passport-photo-display');
+      if (photoDisplay) photoDisplay.textContent = emoji;
+      
+      const buttons = document.querySelectorAll('.avatar-opt-btn');
+      buttons.forEach(btn => {
+        if (btn.getAttribute('data-avatar') === emoji) {
+          btn.classList.remove('border-slate-300', 'bg-white');
+          btn.classList.add('border-pop-dark', 'bg-pop-yellow', 'shadow-brutal-sm');
+        } else {
+          btn.classList.remove('border-pop-dark', 'bg-pop-yellow', 'shadow-brutal-sm');
+          btn.classList.add('border-slate-300', 'bg-white');
+        }
+      });
+    }
+
+    function handleAuthSubmit(event) {
+      event.preventDefault();
+      const usernameInput = document.getElementById('auth-username').value.trim();
+      if (!usernameInput) return;
+
+      const isNewAccount = !currentUser || currentUser.toLowerCase() !== usernameInput.toLowerCase();
+      currentUser = usernameInput;
+      currentAvatar = document.getElementById('auth-selected-avatar').value || '🛵';
+
+      localStorage.setItem('sg_active_user', currentUser);
+      localStorage.setItem('sg_active_avatar', currentAvatar);
+
+      // Check chosen initial data mode (clean vs seed)
+      const initModeRadio = document.querySelector('input[name="auth-init-data"]:checked');
+      const initMode = initModeRadio ? initModeRadio.value : 'clean';
+
+      const key = getStorageKey();
+      const existingData = localStorage.getItem(key);
+
+      if (!existingData) {
+        if (initMode === 'seed') {
+          userEntries = [...DEFAULT_SEED_DATA];
+          userPlans = [...DEFAULT_SEED_PLANS];
+        } else {
+          userEntries = [];
+          userPlans = [];
+        }
+        saveUserData();
+        saveUserPlans();
+      } else {
+        // Load existing data for this returning user
+        try {
+          userEntries = JSON.parse(existingData) || [];
+        } catch (e) {
+          userEntries = [];
+        }
+        const planKey = getPlansStorageKey();
+        const existingPlans = localStorage.getItem(planKey);
+        try {
+          userPlans = existingPlans ? JSON.parse(existingPlans) : [];
+        } catch (e) {
+          userPlans = [];
+        }
+      }
+
+      updateUserStatsInRegistry();
+
+      if (isNewAccount) {
+        logUserActivity('account_created', 'Khởi tạo Hộ Chiếu Mới', `Đã cấp Hộ Chiếu du hành Sài Gòn cho "${currentUser}" (${initMode === 'clean' ? 'Hộ chiếu mới tinh' : 'Nạp sẵn 8 điểm mẫu'})`, '✨');
+      }
+
+      document.getElementById('auth-modal').classList.add('hidden');
+      loadUserData();
+      updateHeaderProfile();
+      showToastNotification(`🛂 Đã kích hoạt Hộ Chiếu cho ${currentUser}!`);
+    }
+
+    function updateHeaderProfile() {
+      const title = document.getElementById('header-title');
+      const avatar = document.getElementById('header-avatar');
+      if (title && currentUser) {
+        title.textContent = `${currentUser.toUpperCase()}'S PASSPORT`;
+      }
+      if (avatar && currentAvatar) {
+        avatar.textContent = currentAvatar;
+      }
+    }
+
+    function promptLogout() {
+      showConfirmDialog({
+        title: 'Đổi Hộ Chiếu / Đăng Xuất? 🛵',
+        message: `Bạn đang ở tài khoản "${currentUser}". Bạn có muốn đổi sang Hộ Chiếu khác?`,
+        confirmText: 'Đổi Hộ Chiếu',
+        isDanger: false,
+        onConfirm: () => {
+          localStorage.removeItem('sg_active_user');
+          localStorage.removeItem('sg_active_avatar');
+          currentUser = null;
+          currentAvatar = '🛵';
+
+          openPassportLoginModal();
+          switchAuthTab('switch');
+          showToastNotification('👋 Đã chuyển sang màn hình chọn Hộ Chiếu!');
+        }
+      });
+    }
+
+    function getStorageKey() {
+      return `sg_passport_data_${currentUser || 'guest'}`;
+    }
+
+    function getPlansStorageKey() {
+      return `sg_passport_plans_${currentUser || 'guest'}`;
+    }
+
+    function getActivitiesStorageKey() {
+      return `sg_passport_activities_${currentUser || 'guest'}`;
+    }
+
+    // ==========================================
+    // PER-USER ACTIVITY LOGGING LOGIC
+    // ==========================================
+    function logUserActivity(type, title, detail, icon) {
+      if (!currentUser) return;
+      const actKey = getActivitiesStorageKey();
+      let acts = [];
+      try {
+        const stored = localStorage.getItem(actKey);
+        if (stored) acts = JSON.parse(stored);
+      } catch (e) {
+        acts = [];
+      }
+
+      const now = new Date();
+      const timeStr = now.toLocaleDateString('vi-VN', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }) + ' ' + now.toLocaleTimeString('vi-VN', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      const newAct = {
+        id: 'act-' + Date.now(),
+        type,
+        title,
+        detail,
+        icon: icon || '📌',
+        timestamp: now.toISOString(),
+        timeStr
+      };
+
+      acts.unshift(newAct);
+      if (acts.length > 100) acts = acts.slice(0, 100);
+      localStorage.setItem(actKey, JSON.stringify(acts));
+    }
+
+    function getUserActivities() {
+      if (!currentUser) return [];
+      const actKey = getActivitiesStorageKey();
+      try {
+        const stored = localStorage.getItem(actKey);
+        if (stored) return JSON.parse(stored);
+      } catch (e) {
+        return [];
+      }
+      return [];
+    }
+
+    function openActivityModal() {
+      const modal = document.getElementById('activity-modal');
+      if (!modal) return;
+
+      const userNameEl = document.getElementById('activity-user-name');
+      const userAvatarEl = document.getElementById('activity-user-avatar');
+      const userStatsEl = document.getElementById('activity-user-stats');
+      const subtitleEl = document.getElementById('activity-modal-subtitle');
+
+      if (userNameEl) userNameEl.textContent = currentUser || 'Người Du Hành';
+      if (userAvatarEl) userAvatarEl.textContent = currentAvatar || '🛵';
+      if (userStatsEl) userStatsEl.textContent = `${userEntries ? userEntries.length : 0} Con Dấu Check-in · ${userPlans ? userPlans.length : 0} Lịch Trình`;
+      if (subtitleEl) subtitleEl.textContent = `Lịch sử các hoạt động của Hộ Chiếu ${currentUser || ''}`;
+
+      renderActivityTimeline();
+      modal.classList.remove('hidden');
+    }
+
+    function closeActivityModal() {
+      const modal = document.getElementById('activity-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function clearUserActivities() {
+      showConfirmDialog({
+        title: 'Xóa Nhật Ký Hoạt Động? 📜',
+        message: `Bạn có muốn xóa toàn bộ lịch sử hoạt động đã ghi của "${currentUser}"? (Các con dấu và lịch trình vẫn giữ nguyên)`,
+        confirmText: 'Xóa lịch sử',
+        isDanger: true,
+        onConfirm: () => {
+          if (currentUser) {
+            localStorage.removeItem(getActivitiesStorageKey());
+            renderActivityTimeline();
+            showToastNotification('🧹 Đã xóa sạch nhật ký hoạt động!');
+          }
+        }
+      });
+    }
+
+    function renderActivityTimeline() {
+      const container = document.getElementById('activity-timeline-list');
+      if (!container) return;
+
+      const activities = getUserActivities();
+
+      if (activities.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 px-4 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-300 space-y-2">
+            <span class="text-3xl">📭</span>
+            <p class="text-xs font-black text-pop-dark uppercase">Chưa có hoạt động nào được ghi lại</p>
+            <p class="text-[11px] text-slate-500 font-medium">Hãy thực hiện Check-in địa điểm mới hoặc tạo Lịch trình vi vu để lưu lại dấu ấn nhé!</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = activities.map(act => {
+        let tagColor = 'bg-slate-100 text-slate-700';
+        if (act.type === 'checkin') tagColor = 'bg-pop-red text-white';
+        else if (act.type === 'plan') tagColor = 'bg-pop-yellow text-pop-dark';
+        else if (act.type === 'convert_spot' || act.type === 'plan_status') tagColor = 'bg-pop-green text-white';
+        else if (act.type === 'account_created' || act.type === 'login') tagColor = 'bg-pop-purple text-white';
+        else if (act.type.includes('delete')) tagColor = 'bg-slate-200 text-slate-600';
+
+        return `
+          <div class="p-3 bg-white rounded-xl border-2 border-pop-dark shadow-xs flex items-start gap-3 relative hover:bg-slate-50 transition">
+            <div class="w-9 h-9 rounded-xl bg-slate-100 border-2 border-pop-dark flex items-center justify-center text-lg shrink-0 mt-0.5 shadow-brutal-sm">
+              ${act.icon || '📌'}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-2">
+                <h4 class="font-display font-black text-xs text-pop-dark truncate">${act.title}</h4>
+                <span class="text-[9px] font-mono font-bold text-slate-500 shrink-0">${act.timeStr}</span>
+              </div>
+              <p class="text-[11px] text-slate-600 font-medium mt-0.5 leading-snug">${act.detail}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function loadUserData() {
+      // Load Passport Stamps
+      const key = getStorageKey();
+      const data = localStorage.getItem(key);
+
+      if (data) {
+        try {
+          userEntries = JSON.parse(data);
+          if (!Array.isArray(userEntries)) userEntries = [];
+        } catch (e) {
+          console.error('Error parsing stored entries:', e);
+          userEntries = [];
+        }
+      } else {
+        userEntries = [];
+        saveUserData();
+      }
+
+      // Load Trip Plans
+      const planKey = getPlansStorageKey();
+      const planData = localStorage.getItem(planKey);
+      if (planData) {
+        try {
+          userPlans = JSON.parse(planData);
+          if (!Array.isArray(userPlans)) userPlans = [];
+        } catch (e) {
+          userPlans = [];
+        }
+      } else {
+        userPlans = [];
+        saveUserPlans();
+      }
+
+      renderJournalFeed();
+      renderPlannerTrips();
+      renderCollections();
+      updateMetroProgress();
+      if (activeTab === 'map') initLeafletMap();
+    }
+
+    function saveUserData() {
+      const key = getStorageKey();
+      localStorage.setItem(key, JSON.stringify(userEntries));
+      updateUserStatsInRegistry();
+    }
+
+    function saveUserPlans() {
+      const key = getPlansStorageKey();
+      localStorage.setItem(key, JSON.stringify(userPlans));
+      updateUserStatsInRegistry();
+    }
+
+    // ==========================================
+    // 4. METRO PROGRESS & DYNAMIC BADGES
+    // ==========================================
+    function updateMetroProgress() {
+      const total = userEntries.length;
+      const target = 15;
+      const percent = Math.min(100, Math.round((total / target) * 100));
+
+      const fill = document.getElementById('metro-progress-fill');
+      const text = document.getElementById('metro-progress-text');
+      const totalCount = document.getElementById('total-stamps-count');
+      const badgeTag = document.getElementById('user-badge-tag');
+
+      if (fill) fill.style.width = `${Math.max(8, percent)}%`;
+      if (text) text.textContent = `${percent}% Phủ Sóng (${total}/${target})`;
+      if (totalCount) totalCount.textContent = `${total} Con Dấu`;
+
+      // Calculate Dynamic Explorer Badge
+      let badgeName = "Chiếu Mới Sài Thành 🐣";
+      let badgeColor = "bg-pop-yellow text-pop-dark";
+
+      const cafeCount = userEntries.filter(e => e.category === 'Góc Phố Cà Phê').length;
+      const choLonCount = userEntries.filter(e => e.category.includes('Chợ Lớn')).length;
+      const nightCount = userEntries.filter(e => e.category.includes('Đường Phố')).length;
+      const thriftCount = userEntries.filter(e => e.category.includes('Mua Sắm') || e.category.includes('Thrift')).length;
+
+      if (total >= 12) {
+        badgeName = "Thổ Địa Sài Thành 👑";
+        badgeColor = "bg-pop-purple text-white";
+      } else if (thriftCount >= 2) {
+        badgeName = "Trùm Local Brand 👟";
+        badgeColor = "bg-pop-pink text-white";
+      } else if (cafeCount >= 3) {
+        badgeName = "Trùm Cà Phê Hay Gì ☕";
+        badgeColor = "bg-pop-red text-white";
+      } else if (choLonCount >= 2) {
+        badgeName = "Dân Chơi Chợ Lớn 🏮";
+        badgeColor = "bg-pop-yellow text-pop-dark";
+      } else if (nightCount >= 2) {
+        badgeName = "Thánh Ăn Đêm Sài Gòn 🍢";
+        badgeColor = "bg-pop-green text-white";
+      } else if (total >= 3) {
+        badgeName = "Tín Đồ Phố Xá 🛵";
+        badgeColor = "bg-pop-cyan text-white";
+      }
+
+      if (badgeTag) {
+        badgeTag.textContent = badgeName;
+        badgeTag.className = `sticker-tag ${badgeColor} text-[9px]`;
+      }
+    }
+
+    // ==========================================
+    // 5. TAB NAVIGATION & VIEW SWITCHING (4 TABS)
+    // ==========================================
+    function switchTab(tabId) {
+      activeTab = tabId;
+
+      const views = {
+        'journal': document.getElementById('view-journal'),
+        'planner': document.getElementById('view-planner'),
+        'collections': document.getElementById('view-collections'),
+        'map': document.getElementById('view-map')
+      };
+
+      const tabs = {
+        'journal': document.getElementById('nav-tab-journal'),
+        'planner': document.getElementById('nav-tab-planner'),
+        'collections': document.getElementById('nav-tab-collections'),
+        'map': document.getElementById('nav-tab-map')
+      };
+
+      // Toggle views
+      Object.keys(views).forEach(k => {
+        if (k === tabId) {
+          views[k]?.classList.remove('hidden');
+          views[k]?.classList.add('block');
+        } else {
+          views[k]?.classList.add('hidden');
+          views[k]?.classList.remove('block');
+        }
+      });
+
+      // Style active nav tabs (Neo-Brutalist highlight)
+      Object.keys(tabs).forEach(k => {
+        const btn = tabs[k];
+        if (!btn) return;
+        if (k === tabId) {
+          btn.classList.add('bg-pop-yellow', 'border-pop-dark', 'shadow-brutal-sm', 'text-pop-dark');
+          btn.classList.remove('border-transparent', 'bg-slate-50', 'text-slate-700');
+        } else {
+          btn.classList.remove('bg-pop-yellow', 'border-pop-dark', 'shadow-brutal-sm', 'text-pop-dark');
+          btn.classList.add('border-transparent', 'bg-slate-50', 'text-slate-700');
+        }
+      });
+
+      if (tabId === 'map') {
+        setTimeout(initOrUpdateMap, 150);
+      } else if (tabId === 'collections') {
+        renderCollections();
+      } else if (tabId === 'planner') {
+        renderPlannerTrips();
+      }
+    }
+
+    // ==========================================
+    // 6. RENDER JOURNAL FEED (POLAROID CARDS)
+    // ==========================================
+    function handleFilterAndSearch() {
+      renderJournalFeed();
+    }
+
+    function renderJournalFeed() {
+      const list = document.getElementById('journal-feed-list');
+      const emptyState = document.getElementById('journal-empty-state');
+      if (!list) return;
+
+      const searchTerm = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+      const catFilter = document.getElementById('category-filter')?.value || 'ALL';
+
+      const filtered = userEntries.filter(entry => {
+        const matchSearch = (entry.name && entry.name.toLowerCase().includes(searchTerm)) ||
+                            (entry.district && entry.district.toLowerCase().includes(searchTerm)) ||
+                            (entry.userNotes && entry.userNotes.toLowerCase().includes(searchTerm));
+        const matchCat = (catFilter === 'ALL') || (entry.category === catFilter);
+        return matchSearch && matchCat;
+      });
+
+      if (filtered.length === 0) {
+        list.innerHTML = '';
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+      }
+
+      if (emptyState) emptyState.classList.add('hidden');
+
+      list.innerHTML = filtered.map(entry => {
+        let catColor = "bg-pop-yellow text-pop-dark";
+        if (entry.category.includes("Cà Phê")) catColor = "bg-pop-red text-white";
+        else if (entry.category.includes("Chợ Lớn")) catColor = "bg-pop-yellow text-pop-dark";
+        else if (entry.category.includes("Tâm Linh")) catColor = "bg-pop-purple text-white";
+        else if (entry.category.includes("Đường Phố")) catColor = "bg-pop-green text-white";
+        else if (entry.category.includes("Di Sản")) catColor = "bg-pop-cyan text-white";
+        else if (entry.category.includes("Mua Sắm") || entry.category.includes("Thrift")) catColor = "bg-pop-pink text-white";
+
+        return `
+          <article class="brutal-card overflow-hidden bg-white p-3.5 space-y-3 relative group">
+            
+            <!-- Card Top Header -->
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1.5 flex-wrap">
+                <span class="sticker-tag ${catColor}">${entry.category}</span>
+                <span class="sticker-tag bg-slate-100 text-slate-700">📍 ${entry.district}</span>
+              </div>
+              
+              <!-- Quick Actions -->
+              <div class="flex items-center gap-1">
+                <button onclick="toggleFavorite('${entry.id}')" class="w-7 h-7 rounded-lg border-1.5 border-pop-dark flex items-center justify-center text-xs ${entry.isFavorite ? 'bg-pop-red text-white' : 'bg-slate-100 text-slate-400 hover:text-pop-red'}" title="Yêu thích">
+                  <i class="fa-${entry.isFavorite ? 'solid' : 'regular'} fa-heart"></i>
+                </button>
+                <button onclick="deleteEntry('${entry.id}')" class="w-7 h-7 rounded-lg border-1.5 border-pop-dark bg-slate-100 hover:bg-red-100 hover:text-pop-red text-slate-500 flex items-center justify-center text-xs" title="Xóa">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Polaroid Photo Area with Base64 / Real Image -->
+            <div class="relative w-full h-52 sm:h-56 rounded-xl overflow-hidden border-2 border-pop-dark bg-slate-900 shadow-inner">
+              <img src="${entry.imageUrl}" alt="${entry.name}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&auto=format&fit=crop&q=80'" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+              
+              <!-- Stamp Badge Overlay (Con dấu số) -->
+              <div class="absolute bottom-2.5 right-2.5 -rotate-3 hover:rotate-0 transition">
+                <div class="px-2.5 py-1 bg-pop-dark/95 text-pop-yellow rounded-lg border-2 border-pop-yellow shadow-brutal-sm font-display font-black text-[11px] uppercase tracking-wide">
+                  ${entry.stampBadge || 'SÀI GÒN CHECK-IN 🥤'}
+                </div>
+              </div>
+            </div>
+
+            <!-- Place Details -->
+            <div class="space-y-1">
+              <div class="flex items-baseline justify-between">
+                <h3 class="font-display font-black text-base text-pop-dark">${entry.name}</h3>
+                <span class="text-[10px] font-mono font-bold text-slate-500">${entry.date}</span>
+              </div>
+              <div class="flex items-center justify-between text-[11px] font-bold">
+                <span class="text-slate-600 flex items-center gap-1 truncate">
+                  <i class="fa-solid fa-location-dot text-pop-red text-xs"></i>
+                  <span>${entry.address || entry.district}</span>
+                </span>
+                <span class="sticker-tag bg-pop-yellow text-pop-dark text-[9px] shrink-0">
+                  ${entry.vibeScore || 'Vibe: 10/10 ☕'}
+                </span>
+              </div>
+            </div>
+
+            <!-- User Notes -->
+            ${entry.userNotes ? `
+              <div class="p-2.5 bg-amber-50 rounded-xl border-1.5 border-pop-dark/30 text-xs font-semibold text-slate-800 space-y-0.5">
+                <div class="text-[9px] font-black uppercase text-amber-700">Ký sự cá nhân:</div>
+                <p>${entry.userNotes}</p>
+              </div>
+            ` : ''}
+
+            <!-- Vibe Poetic Review Quote -->
+            ${entry.aiReview ? `
+              <div class="p-2 bg-pop-purple-light/70 rounded-xl border-1.5 border-pop-dark/30 flex items-start gap-2 text-xs font-mono font-bold text-pop-purple">
+                <span class="text-sm">✨</span>
+                <p class="italic">"${entry.aiReview}"</p>
+              </div>
+            ` : ''}
+
+          </article>
+        `;
+      }).join('');
+    }
+
+    function toggleFavorite(id) {
+      const entry = userEntries.find(e => e.id === id);
+      if (entry) {
+        entry.isFavorite = !entry.isFavorite;
+        saveUserData();
+        renderJournalFeed();
+        logUserActivity('favorite', entry.isFavorite ? 'Yêu thích con dấu' : 'Bỏ yêu thích', `Địa điểm "${entry.name}"`, entry.isFavorite ? '❤️' : '🤍');
+        showToastNotification(entry.isFavorite ? '❤️ Đã lưu vào mục yêu thích!' : '💔 Đã bỏ yêu thích!');
+      }
+    }
+
+    function deleteEntry(id) {
+      const entry = userEntries.find(e => e.id === id);
+      const name = entry ? entry.name : 'địa điểm này';
+      showConfirmDialog({
+        title: 'Xóa Con Dấu Hộ Chiếu? 🗑️',
+        message: `Bạn có chắc muốn xóa dấu check-in "${name}" khỏi Hộ Chiếu Sài Gòn?`,
+        confirmText: 'Xóa ngay',
+        isDanger: true,
+        onConfirm: () => {
+          userEntries = userEntries.filter(e => e.id !== id);
+          saveUserData();
+          renderJournalFeed();
+          updateMetroProgress();
+          renderCollections();
+          initLeafletMap();
+          logUserActivity('delete_entry', 'Xóa con dấu Check-in', `Đã gỡ bỏ con dấu "${name}" khỏi Hộ Chiếu`, '🗑️');
+          showToastNotification('🗑️ Đã xóa con dấu thành công!');
+        }
+      });
+    }
+
+    // ==========================================
+    // 7. TRIP PLANNER & ITINERARY MODULE
+    // ==========================================
+    function openPlanModal() {
+      const modal = document.getElementById('plan-modal');
+      if (modal) modal.classList.remove('hidden');
+    }
+
+    function closePlanModal() {
+      const modal = document.getElementById('plan-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function addSpotToPlan(spotName) {
+      const textarea = document.getElementById('input-plan-spots');
+      if (!textarea) return;
+      const current = textarea.value.trim();
+      if (current) {
+        textarea.value = current + '\n' + spotName;
+      } else {
+        textarea.value = spotName;
+      }
+    }
+
+    function handlePlanSubmit(event) {
+      event.preventDefault();
+      const name = document.getElementById('input-plan-name').value.trim();
+      const date = document.getElementById('input-plan-date').value;
+      const status = document.getElementById('input-plan-status').value;
+      const budget = document.getElementById('input-plan-budget').value.trim() || 'Tự do';
+      const district = document.getElementById('input-plan-district').value;
+      const spotsRaw = document.getElementById('input-plan-spots').value.trim();
+      const notes = document.getElementById('input-plan-notes').value.trim();
+
+      const spotsList = spotsRaw.split('\n')
+        .map(s => s.trim().replace(/^[0-9]+[.)]\s*/, ''))
+        .filter(s => s.length > 0)
+        .map(spotText => {
+          let category = 'Góc Phố Cà Phê';
+          if (spotText.includes('Chùa') || spotText.includes('Đền') || spotText.includes('Miếu')) category = 'Chùa Chiền & Tâm Linh';
+          else if (spotText.includes('Chợ Lớn') || spotText.includes('Hào Sĩ') || spotText.includes('Sủi Cảo') || spotText.includes('Bánh Hẹ')) category = 'Vibe Chợ Lớn (Khu Người Hoa)';
+          else if (spotText.includes('Ốc') || spotText.includes('Ăn') || spotText.includes('Cơm Tấm')) category = 'Sài Gòn Đêm & Món Đường Phố';
+          else if (spotText.includes('Bưu Điện') || spotText.includes('Bến Thành') || spotText.includes('Dinh')) category = 'Chợ Sài Gòn & Di Sản';
+
+          return {
+            name: spotText,
+            category,
+            checked: false
+          };
+        });
+
+      const newPlan = {
+        id: 'plan-' + Date.now(),
+        name,
+        date,
+        status,
+        budget,
+        district,
+        spots: spotsList,
+        notes
+      };
+
+      userPlans.unshift(newPlan);
+      saveUserPlans();
+      renderPlannerTrips();
+      closePlanModal();
+
+      // Reset form
+      document.getElementById('plan-form').reset();
+      setupDefaultFormDate();
+      logUserActivity('plan', 'Tạo lịch trình vi vu', `Đã lên kế hoạch "${name}" (${spotsList.length} địa điểm dừng chân) - Ngày: ${date}`, '🗺️');
+      showToastNotification(`🗺️ Đã tạo lịch trình "${name}"!`);
+    }
+
+    function renderPlannerTrips() {
+      const container = document.getElementById('planner-trips-list');
+      const emptyState = document.getElementById('planner-empty-state');
+      if (!container) return;
+
+      if (!userPlans || userPlans.length === 0) {
+        container.innerHTML = '';
+        if (emptyState) emptyState.classList.remove('hidden');
+        return;
+      }
+
+      if (emptyState) emptyState.classList.add('hidden');
+
+      container.innerHTML = userPlans.map(plan => {
+        let statusBadge = "bg-pop-yellow text-pop-dark";
+        if (plan.status.includes("Đang Vi Vu")) statusBadge = "bg-pop-green text-white";
+        else if (plan.status.includes("Đã Hoàn Thành")) statusBadge = "bg-slate-200 text-slate-700";
+
+        const totalSpots = plan.spots ? plan.spots.length : 0;
+        const completedSpots = plan.spots ? plan.spots.filter(s => s.checked).length : 0;
+
+        return `
+          <div class="brutal-card p-3.5 space-y-3 bg-white">
+            
+            <!-- Plan Header -->
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="sticker-tag ${statusBadge} text-[9px] mb-1">${plan.status}</span>
+                <h3 class="font-display font-black text-sm text-pop-dark">${plan.name}</h3>
+                <div class="flex items-center gap-2 text-[11px] font-bold text-slate-500 mt-0.5">
+                  <span>📅 ${plan.date}</span>
+                  <span>•</span>
+                  <span>💰 ${plan.budget}</span>
+                </div>
+              </div>
+
+              <!-- Delete / Update Status -->
+              <div class="flex items-center gap-1">
+                <button onclick="togglePlanStatus('${plan.id}')" class="w-7 h-7 rounded-lg border-1.5 border-pop-dark bg-slate-100 hover:bg-pop-yellow flex items-center justify-center text-xs" title="Chuyển trạng thái">
+                  <i class="fa-solid fa-arrows-rotate"></i>
+                </button>
+                <button onclick="deletePlan('${plan.id}')" class="w-7 h-7 rounded-lg border-1.5 border-pop-dark bg-slate-100 hover:bg-red-100 hover:text-pop-red text-slate-500 flex items-center justify-center text-xs" title="Xóa lịch trình">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Spots Check-list with One-Click Turn into Passport Stamp -->
+            <div class="space-y-1.5 bg-slate-50 p-2.5 rounded-xl border border-pop-dark/20">
+              <div class="flex items-center justify-between text-[10px] font-black uppercase text-slate-500">
+                <span>Điểm dừng chân (${completedSpots}/${totalSpots}):</span>
+                <span class="text-pop-purple">1-Click Check-in 📸</span>
+              </div>
+
+              <div class="space-y-1">
+                ${plan.spots.map((spot, idx) => `
+                  <div class="flex items-center justify-between bg-white px-2 py-1.5 rounded-lg border border-slate-200 gap-2">
+                    <div class="flex items-center gap-2 truncate">
+                      <button onclick="toggleSpotChecked('${plan.id}', ${idx})" class="w-4 h-4 rounded border-2 border-pop-dark flex items-center justify-center text-[10px] ${spot.checked ? 'bg-pop-green text-white' : 'bg-white text-transparent'}">
+                        <i class="fa-solid fa-check"></i>
+                      </button>
+                      <span class="text-xs font-bold ${spot.checked ? 'line-through text-slate-400' : 'text-pop-dark'} truncate">
+                        ${spot.name}
+                      </span>
+                    </div>
+
+                    <!-- Quick Convert to Passport Stamp -->
+                    <button onclick="convertPlanSpotToCheckin('${plan.id}', ${idx})" class="brutal-btn px-2 py-0.5 bg-pop-red hover:bg-red-500 text-white rounded-lg text-[10px] font-black shrink-0 flex items-center gap-1 shadow-brutal-sm" title="Chuyển điểm này thành con dấu Hộ Chiếu">
+                      <i class="fa-solid fa-stamp text-pop-yellow text-[9px]"></i>
+                      <span>Đóng Dấu</span>
+                    </button>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Notes -->
+            ${plan.notes ? `
+              <div class="text-[11px] font-semibold text-slate-600 bg-amber-50/70 p-2 rounded-lg border border-dashed border-amber-300">
+                💡 <strong class="text-amber-800">Lưu ý:</strong> ${plan.notes}
+              </div>
+            ` : ''}
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    function togglePlanStatus(planId) {
+      const plan = userPlans.find(p => p.id === planId);
+      if (!plan) return;
+
+      if (plan.status === 'Sắp Đi ⏳') plan.status = 'Đang Vi Vu 🛵';
+      else if (plan.status === 'Đang Vi Vu 🛵') plan.status = 'Đã Hoàn Thành ✅';
+      else plan.status = 'Sắp Đi ⏳';
+
+      saveUserPlans();
+      renderPlannerTrips();
+      logUserActivity('plan_status', 'Đổi trạng thái lịch trình', `Lịch trình "${plan.name}" chuyển sang: ${plan.status}`, '🛵');
+      showToastNotification(`Trạng thái: ${plan.status}`);
+    }
+
+    function toggleSpotChecked(planId, spotIdx) {
+      const plan = userPlans.find(p => p.id === planId);
+      if (plan && plan.spots && plan.spots[spotIdx]) {
+        plan.spots[spotIdx].checked = !plan.spots[spotIdx].checked;
+        saveUserPlans();
+        renderPlannerTrips();
+        const spotName = plan.spots[spotIdx].name;
+        if (plan.spots[spotIdx].checked) {
+          logUserActivity('spot_checked', 'Đánh dấu điểm dừng chân', `Đã ghé thăm điểm "${spotName}" trong lịch trình "${plan.name}"`, '✅');
+        }
+      }
+    }
+
+    function deletePlan(planId) {
+      const plan = userPlans.find(p => p.id === planId);
+      const name = plan ? plan.name : 'lịch trình này';
+      showConfirmDialog({
+        title: 'Xóa Lịch Trình Vi Vu? 🗺️',
+        message: `Bạn có chắc muốn xóa lịch trình "${name}"?`,
+        confirmText: 'Xóa ngay',
+        isDanger: true,
+        onConfirm: () => {
+          userPlans = userPlans.filter(p => p.id !== planId);
+          saveUserPlans();
+          renderPlannerTrips();
+          logUserActivity('delete_plan', 'Xóa lịch trình', `Đã xóa lịch trình "${name}"`, '🗑️');
+          showToastNotification('🗑️ Đã xóa lịch trình!');
+        }
+      });
+    }
+
+    // Convert planned spot to Passport Stamp
+    function convertPlanSpotToCheckin(planId, spotIdx) {
+      const plan = userPlans.find(p => p.id === planId);
+      if (!plan || !plan.spots || !plan.spots[spotIdx]) return;
+
+      const spot = plan.spots[spotIdx];
+      spot.checked = true;
+      saveUserPlans();
+      renderPlannerTrips();
+
+      openCheckinModal();
+      document.getElementById('input-location-name').value = spot.name;
+      document.getElementById('input-category').value = spot.category;
+      document.getElementById('input-stamp-badge').value = `${spot.name.slice(0, 18)} 📍`;
+      document.getElementById('input-user-notes').value = `Hoàn thành từ lịch trình "${plan.name}"!`;
+
+      // Set authentic photo based on category
+      let spotPhoto = 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&auto=format&fit=crop&q=80';
+      if (spot.category.includes('Cà Phê')) spotPhoto = 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&auto=format&fit=crop&q=80';
+      else if (spot.category.includes('Chợ Lớn')) spotPhoto = 'https://images.unsplash.com/photo-1541696432-82c6da8ce7bf?w=800&auto=format&fit=crop&q=80';
+      else if (spot.category.includes('Tâm Linh')) spotPhoto = 'https://images.unsplash.com/photo-1563822249548-9a72b6353cd1?w=800&auto=format&fit=crop&q=80';
+      else if (spot.category.includes('Đường Phố')) spotPhoto = 'https://images.unsplash.com/photo-1555126634-323283e090fa?w=800&auto=format&fit=crop&q=80';
+      else if (spot.category.includes('Mua Sắm') || spot.category.includes('Thrift')) spotPhoto = 'https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=800&auto=format&fit=crop&q=80';
+
+      const previewImg = document.getElementById('image-preview-img');
+      const hiddenUrl = document.getElementById('input-image-url');
+      if (previewImg) previewImg.src = spotPhoto;
+      if (hiddenUrl) hiddenUrl.value = spotPhoto;
+
+      generateVibeReview();
+      logUserActivity('convert_spot', 'Chuyển điểm vi vu sang Check-in', `Địa điểm "${spot.name}" từ lịch trình "${plan.name}"`, '📌');
+      showToastNotification(`📸 Đã nạp thông tin "${spot.name}" vào Check-in!`);
+    }
+
+    // ==========================================
+    // 8. RENDER 6 THEMATIC COLLECTIONS
+    // ==========================================
+    const THEMATIC_COLLECTIONS = [
+      {
+        title: 'Góc Phố Cà Phê',
+        icon: '☕',
+        color: 'bg-pop-red',
+        desc: 'Cà phê bệt, chung cư cũ, cà phê vợt gia truyền',
+        sampleSpots: ['Cà phê Vợt Ba Lù', 'Cà phê Bệt Nhà Thờ', 'Chung Cư 42 Nguyễn Huệ']
+      },
+      {
+        title: 'Vibe Chợ Lớn (Khu Người Hoa)',
+        icon: '🏮',
+        color: 'bg-pop-yellow',
+        desc: 'Hào Sĩ Phường, bánh hẹ, sủi cảo Hà Tôn Quyền, đèn lồng',
+        sampleSpots: ['Chung cư Hào Sĩ Phường', 'Hẻm Sủi Cảo Hà Tôn Quyền', 'Bánh Hẹ Lê Quang Sung']
+      },
+      {
+        title: 'Chùa Chiền & Tâm Linh',
+        icon: '⛩️',
+        color: 'bg-pop-purple',
+        desc: 'Chùa Bà Thiên Hậu, Chùa Ngọc Hoàng, Chùa Bửu Long',
+        sampleSpots: ['Chùa Bà Thiên Hậu', 'Chùa Ngọc Hoàng', 'Chùa Bửu Long']
+      },
+      {
+        title: 'Sài Gòn Đêm & Món Đường Phố',
+        icon: '🍢',
+        color: 'bg-pop-green',
+        desc: 'Phố ốc Vĩnh Khánh, cơm tấm Ba Ghiền, hủ tiếu gõ',
+        sampleSpots: ['Ốc Hẻm Vĩnh Khánh', 'Cơm Tấm Ba Ghiền', 'Bánh Mì Đêm Bưu Điện']
+      },
+      {
+        title: 'Chợ Sài Gòn & Di Sản',
+        icon: '🏛️',
+        color: 'bg-pop-cyan',
+        desc: 'Chợ Bến Thành, Chợ Bà Chiểu, Bưu điện TP, Dinh Độc Lập',
+        sampleSpots: ['Chợ Bến Thành', 'Chợ Bà Chiểu & Xôi Gà', 'Bưu Điện Trung Tâm TP']
+      },
+      {
+        title: 'Mua Sắm & Thrift',
+        icon: '🛍️',
+        color: 'bg-pop-pink',
+        desc: 'The New Playground, phố Nguyễn Trãi, hẻm thrift Trần Quang Diệu & Bà Chiểu',
+        sampleSpots: ['The New Playground', 'Phố Nguyễn Trãi', 'Thrift Trần Quang Diệu', 'Đồ Si Chợ Bà Chiểu']
+      }
+    ];
+
+    function renderCollections() {
+      const container = document.getElementById('collections-grid');
+      const badge = document.getElementById('collections-completed-badge');
+      if (!container) return;
+
+      let completedCategoriesCount = 0;
+
+      container.innerHTML = THEMATIC_COLLECTIONS.map(col => {
+        const matchingEntries = userEntries.filter(e => e.category === col.title);
+        const count = matchingEntries.length;
+        const isUnlocked = count > 0;
+        if (count >= 2) completedCategoriesCount++;
+
+        return `
+          <div class="brutal-card p-3.5 space-y-2.5 bg-white">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-9 h-9 rounded-xl ${col.color} border-2 border-pop-dark flex items-center justify-center text-lg text-white font-black shrink-0">
+                  ${col.icon}
+                </div>
+                <div>
+                  <h3 class="font-display font-black text-sm text-pop-dark">${col.title}</h3>
+                  <p class="text-[10px] text-slate-500 font-bold">${col.desc}</p>
+                </div>
+              </div>
+
+              <span class="sticker-tag ${isUnlocked ? 'bg-pop-green text-white' : 'bg-slate-200 text-slate-600'}">
+                ${isUnlocked ? `ĐÃ MỞ (${count})` : 'CHƯA MỞ 🔒'}
+              </span>
+            </div>
+
+            <!-- Sample spots chips -->
+            <div class="flex items-center gap-1.5 flex-wrap pt-1">
+              ${col.sampleSpots.map(s => {
+                const visited = matchingEntries.some(e => e.name.toLowerCase().includes(s.toLowerCase()));
+                return `
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-lg border border-pop-dark/40 ${visited ? 'bg-pop-yellow-light text-pop-dark font-black' : 'bg-slate-100 text-slate-500'}">
+                    ${visited ? '✓ ' : '+ '}${s}
+                  </span>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      if (badge) {
+        badge.textContent = `${completedCategoriesCount}/6 Hoàn Tất`;
+      }
+    }
+
+    // ==========================================
+    // 9. LEAFLET INTERACTIVE MAP
+    // ==========================================
+    function initOrUpdateMap() {
+      const mapContainer = document.getElementById('saigon-map');
+      if (!mapContainer) return;
+
+      if (!leafletMap) {
+        leafletMap = L.map('saigon-map', {
+          zoomControl: false,
+        }).setView([10.7769, 106.7009], 13);
+
+        L.control.zoom({ position: 'topright' }).addTo(leafletMap);
+
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+          maxZoom: 19
+        }).addTo(leafletMap);
+      }
+
+      // Clear existing markers
+      mapMarkers.forEach(m => leafletMap.removeLayer(m));
+      mapMarkers = [];
+
+      // Add markers for all user check-ins
+      userEntries.forEach(entry => {
+        if (!entry.coords || entry.coords.length !== 2) return;
+
+        let pinBg = '#FF4D4D';
+        if (entry.category.includes('Cà Phê')) pinBg = '#FF4D4D';
+        else if (entry.category.includes('Chợ Lớn')) pinBg = '#FACC15';
+        else if (entry.category.includes('Tâm Linh')) pinBg = '#8B5CF6';
+        else if (entry.category.includes('Đường Phố')) pinBg = '#10B981';
+        else if (entry.category.includes('Di Sản')) pinBg = '#06B6D4';
+        else if (entry.category.includes('Mua Sắm') || entry.category.includes('Thrift')) pinBg = '#EC4899';
+
+        const customIcon = L.divIcon({
+          className: 'custom-brutal-pin',
+          html: `
+            <div style="background-color: ${pinBg}; width: 30px; height: 30px; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); border: 2.5px solid #0F172A; box-shadow: 2px 2px 0px #0F172A; display: flex; align-items: center; justify-content: center;">
+              <span style="transform: rotate(45deg); font-size: 13px;">📍</span>
+            </div>
+          `,
+          iconSize: [30, 30],
+          iconAnchor: [15, 30],
+          popupAnchor: [0, -30]
+        });
+
+        const popupContent = `
+          <div style="width: 190px; font-family: 'Plus Jakarta Sans', sans-serif;" class="p-1 space-y-1.5">
+            <img src="${entry.imageUrl}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&auto=format&fit=crop&q=80'" style="width: 100%; height: 95px; object-fit: cover; border-radius: 8px; border: 1.5px solid #0F172A;">
+            <div style="font-weight: 900; font-size: 12px; color: #0F172A;">${entry.name}</div>
+            <div style="font-size: 10px; color: #EF4444; font-weight: 700;">📍 ${entry.district}</div>
+            <div style="font-size: 9px; font-style: italic; color: #64748B;">"${entry.aiReview || 'Góc phố Sài Gòn'}"</div>
+          </div>
+        `;
+
+        const marker = L.marker(entry.coords, { icon: customIcon })
+          .addTo(leafletMap)
+          .bindPopup(popupContent);
+
+        mapMarkers.push(marker);
+      });
+
+      leafletMap.invalidateSize();
+    }
+
+    function locateUserOnMap() {
+      if (!navigator.geolocation) {
+        showToastNotification('⚠️ Không hỗ trợ GPS');
+        return;
+      }
+
+      showToastNotification('🛰️ Đang lấy toạ độ GPS của bạn...');
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+
+          if (leafletMap) {
+            leafletMap.setView([lat, lng], 15);
+            
+            const userIcon = L.divIcon({
+              className: 'user-gps-pin',
+              html: `<div style="background: #10B981; width: 18px; height: 18px; border-radius: 50%; border: 3px solid #FFFFFF; box-shadow: 0 0 0 2px #0F172A;"></div>`,
+              iconSize: [18, 18],
+              iconAnchor: [9, 9]
+            });
+
+            L.marker([lat, lng], { icon: userIcon }).addTo(leafletMap).bindPopup('<b>Vị trí của bạn</b>').openPopup();
+          }
+        },
+        (err) => {
+          showToastNotification('⚠️ Không thể lấy toạ độ GPS.');
+        }
+      );
+    }
+
+    // ==========================================
+    // 10. CHECK-IN MODAL, REAL PHOTO & GPS
+    // ==========================================
+    function openCheckinModal() {
+      const modal = document.getElementById('checkin-modal');
+      if (modal) modal.classList.remove('hidden');
+
+      const previewImg = document.getElementById('image-preview-img');
+      const hiddenUrl = document.getElementById('input-image-url');
+      if (previewImg && (!previewImg.src || previewImg.src.includes('wikimedia') || previewImg.src === '')) {
+        const fallbackUrl = 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&auto=format&fit=crop&q=80';
+        previewImg.src = fallbackUrl;
+        if (hiddenUrl) hiddenUrl.value = fallbackUrl;
+      }
+
+      // Initialize star rating to 5 stars by default
+      setStarRating(currentCheckinRating || 5);
+    }
+
+    function closeCheckinModal() {
+      const modal = document.getElementById('checkin-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function processAndCompressImage(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const maxDim = 1200;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height && width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+            resolve(compressedDataUrl);
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handleImageFileSelect(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const previewImg = document.getElementById('image-preview-img');
+      const hiddenUrl = document.getElementById('input-image-url');
+      const indicator = document.getElementById('photo-source-indicator');
+
+      try {
+        const dataUrl = await processAndCompressImage(file);
+        if (previewImg) previewImg.src = dataUrl;
+        if (hiddenUrl) hiddenUrl.value = dataUrl;
+        if (indicator) {
+          indicator.innerHTML = `<i class="fa-solid fa-camera text-pop-green"></i> <span>Ảnh người dùng (${(file.size / 1024).toFixed(0)}KB)</span>`;
+        }
+
+        generateVibeReview();
+      } catch (err) {
+        console.error('Lỗi khi đọc file ảnh:', err);
+        showToastNotification('⚠️ Không thể tải ảnh, vui lòng thử lại!');
+      }
+    }
+
+    async function getGPSLocation() {
+      const btn = document.getElementById('btn-get-gps');
+      const statusText = document.getElementById('gps-status-text');
+      const latInput = document.getElementById('input-gps-lat');
+      const lngInput = document.getElementById('input-gps-lng');
+
+      if (!navigator.geolocation) {
+        showToastNotification('⚠️ Trình duyệt không hỗ trợ GPS.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Đang lấy...</span>`;
+      statusText.innerHTML = `<i class="fa-solid fa-satellite-dish text-amber-500 fa-spin"></i> <span>Đang kết nối vệ tinh GPS...</span>`;
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          latInput.value = lat;
+          lngInput.value = lng;
+
+          statusText.innerHTML = `<i class="fa-solid fa-location-dot text-pop-green"></i> <span class="text-pop-dark font-black">GPS: ${lat.toFixed(5)}° N, ${lng.toFixed(5)}° E</span>`;
+          btn.innerHTML = `<i class="fa-solid fa-check text-pop-yellow"></i> <span>Đã Định Vị</span>`;
+          btn.disabled = false;
+          showToastNotification(`📍 Đã lấy GPS: ${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+
+          autoDetectNearestDistrict(lat, lng);
+        },
+        (error) => {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-location-crosshairs"></i> <span>Lấy Lại</span>`;
+          statusText.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-pop-red"></i> <span class="text-pop-red">Không thể lấy toạ độ GPS.</span>`;
+          showToastNotification('⚠️ Không thể lấy toạ độ GPS.');
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    }
+
+    function autoDetectNearestDistrict(lat, lng) {
+      const districtCoords = {
+        "Quận 1": [10.7769, 106.7009],
+        "Quận 3": [10.7845, 106.6842],
+        "Quận 5": [10.7540, 106.6630],
+        "Quận 6": [10.7480, 106.6350],
+        "Quận 4": [10.7600, 106.7050],
+        "Quận 10": [10.7710, 106.6680],
+        "Quận Phú Nhuận": [10.7990, 106.6800],
+        "Quận Bình Thạnh": [10.8030, 106.7000],
+        "TP. Thủ Đức": [10.8490, 106.7720]
+      };
+
+      let minDistance = Infinity;
+      let closestDistrict = "Quận 1";
+
+      for (const [dist, coords] of Object.entries(districtCoords)) {
+        const d = Math.hypot(coords[0] - lat, coords[1] - lng);
+        if (d < minDistance) {
+          minDistance = d;
+          closestDistrict = dist;
+        }
+      }
+
+      const select = document.getElementById('input-district');
+      if (select) select.value = closestDistrict;
+    }
+
+    // ==========================================
+    // 10. STAR RATING & VIBE SELECTION
+    // ==========================================
+    let currentCheckinRating = 5;
+
+    function setStarRating(rating) {
+      currentCheckinRating = Number(rating);
+      const hiddenInput = document.getElementById('input-vibe-score');
+      const starLabel = document.getElementById('star-rating-label');
+      
+      const roundedStars = Math.floor(currentCheckinRating);
+      let starsEmoji = '⭐'.repeat(Math.max(1, roundedStars));
+      if (currentCheckinRating % 1 !== 0) starsEmoji += '½';
+
+      let descriptor = 'Cực Phẩm Sài Gòn ☕';
+      if (currentCheckinRating === 4) descriptor = 'Rất Đỉnh Sài Gòn 🥢';
+      else if (currentCheckinRating === 3) descriptor = 'Ổn Áp Đổi Gió 🍵';
+      else if (currentCheckinRating === 2) descriptor = 'Tàm Tạm Vừa Miệng 🛵';
+      else if (currentCheckinRating === 1) descriptor = 'Chưa Ưng Ý ❌';
+      else if (currentCheckinRating === 4.8) descriptor = 'Chuẩn Vị Chợ Lớn 🏮';
+      else if (currentCheckinRating === 4.5) descriptor = 'Chuẩn Gu Streetwear 👟';
+
+      const fullLabel = `${currentCheckinRating.toFixed(1)} / 5.0 ${starsEmoji} (${descriptor})`;
+      const storageValue = `${currentCheckinRating.toFixed(1)} ${starsEmoji} ${descriptor}`;
+
+      if (hiddenInput) hiddenInput.value = storageValue;
+      if (starLabel) starLabel.textContent = fullLabel;
+
+      // Update star buttons visual state
+      const starBtns = document.querySelectorAll('.star-btn');
+      starBtns.forEach(btn => {
+        const val = parseInt(btn.getAttribute('data-star-val'), 10);
+        if (val <= Math.ceil(currentCheckinRating)) {
+          btn.classList.add('text-amber-400', 'scale-110');
+          btn.classList.remove('text-slate-300');
+        } else {
+          btn.classList.remove('text-amber-400', 'scale-110');
+          btn.classList.add('text-slate-300');
+        }
+      });
+
+      // Update active highlight on level chips
+      const chips = document.querySelectorAll('.vibe-tag-chip');
+      chips.forEach(chip => {
+        const chipVal = parseFloat(chip.getAttribute('data-chip-stars'));
+        if (chipVal === currentCheckinRating) {
+          chip.classList.add('bg-pop-yellow', 'text-pop-dark', 'border-pop-dark', 'shadow-xs');
+          chip.classList.remove('bg-white', 'text-slate-700', 'border-slate-300');
+        } else {
+          chip.classList.remove('bg-pop-yellow', 'text-pop-dark', 'border-pop-dark', 'shadow-xs');
+          chip.classList.add('bg-white', 'text-slate-700', 'border-slate-300');
+        }
+      });
+    }
+
+    function previewStars(rating) {
+      const starBtns = document.querySelectorAll('.star-btn');
+      starBtns.forEach(btn => {
+        const val = parseInt(btn.getAttribute('data-star-val'), 10);
+        if (val <= rating) {
+          btn.classList.add('text-amber-400', 'scale-115');
+          btn.classList.remove('text-slate-300');
+        } else {
+          btn.classList.remove('text-amber-400', 'scale-115');
+          btn.classList.add('text-slate-300');
+        }
+      });
+    }
+
+    function resetStarsPreview() {
+      setStarRating(currentCheckinRating);
+    }
+
+    function handleVibePresetChange(vibeText, stars = 5) {
+      const hiddenInput = document.getElementById('input-vibe-score');
+      if (hiddenInput) hiddenInput.value = vibeText;
+      setStarRating(stars);
+      showToastNotification(`✨ Đã chọn vibe: ${vibeText}`);
+    }
+
+    function loadRandomSaigonPhoto() {
+      const presets = [
+        {
+          name: "The New Playground",
+          district: "Quận 1",
+          address: "26 Lý Tự Trọng, Bến Nghé, Quận 1",
+          category: "Mua Sắm & Thrift",
+          stamp: "Trùm Local Brand 👟",
+          vibeScore: "5.0 ⭐⭐⭐⭐⭐ Cực Cháy Phố 👟",
+          stars: 5,
+          url: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?w=800&auto=format&fit=crop&q=80",
+          aiReview: "Xuống hầm quẹo lựa outfit local brand, nhạc căng đét, lên đồ là bao cháy phố.",
+          coords: [10.7765, 106.7008]
+        },
+        {
+          name: "Phố Đồ Thrift Trần Quang Diệu",
+          district: "Quận 3",
+          address: "Đường Trần Quang Diệu, Phường 14, Quận 3",
+          category: "Mua Sắm & Thrift",
+          stamp: "Trùm Secondhand 🧥",
+          vibeScore: "4.5 ⭐⭐⭐⭐½ Chuẩn Gu Vintage 🧥",
+          stars: 5,
+          url: "https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?w=800&auto=format&fit=crop&q=80",
+          aiReview: "Lội hẻm bới đồ 2hand tuyển, kiên nhẫn chút là lụm được em áo khoác vintage độc bản giá rẻ giật mình.",
+          coords: [10.7865, 106.6772]
+        },
+        {
+          name: "Cà phê Vợt Ba Lù",
+          district: "Quận 5",
+          address: "Chợ Phùng Hưng, Phường 14, Quận 5",
+          category: "Góc Phố Cà Phê",
+          stamp: "Cà Phê Vợt Ba Lù ☕",
+          vibeScore: "5.0 ⭐⭐⭐⭐⭐ Cực Phẩm Cà Phê ☕",
+          stars: 5,
+          url: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&auto=format&fit=crop&q=80",
+          aiReview: "Cà phê vợt rang bơ thơm nức mũi, ngồi ghế đẩu xì xụp ly bạc xỉu nóng ngắm chợ sáng nhộn nhịp.",
+          coords: [10.7544, 106.6578]
+        },
+        {
+          name: "Chùa Bà Thiên Hậu",
+          district: "Quận 5",
+          address: "710 Nguyễn Trãi, Phường 11, Quận 5",
+          category: "Chùa Chiền & Tâm Linh",
+          stamp: "Chùa Bà Thiên Hậu 🏮",
+          vibeScore: "5.0 ⭐⭐⭐⭐⭐ An Yên Thanh Tịnh 🏮",
+          stars: 5,
+          url: "https://images.unsplash.com/photo-1563822249548-9a72b6353cd1?w=800&auto=format&fit=crop&q=80",
+          aiReview: "Nhang vòng cuộn khói an yên giữa mái chùa cổ, bước vô là thấy lòng nhẹ nhõm liền.",
+          coords: [10.7533, 106.6599]
+        },
+        {
+          name: "Bưu Điện Trung Tâm Thành Phố",
+          district: "Quận 1",
+          address: "02 Công Xã Paris, Phường Bến Nghé, Quận 1",
+          category: "Chợ Sài Gòn & Di Sản",
+          stamp: "Bưu Điện Thành Phố 📬",
+          vibeScore: "4.8 ⭐⭐⭐⭐⭐ Check-in Quốc Dân 🏛️",
+          stars: 5,
+          url: "https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=800&auto=format&fit=crop&q=80",
+          aiReview: "Kiến trúc trăm năm góc nào lên hình cũng đỉnh, cảm nhận trọn vẹn nét hào sảng Sài Gòn.",
+          coords: [10.7798, 106.6999]
+        },
+        {
+          name: "Phố Ốc Đêm Vĩnh Khánh",
+          district: "Quận 4",
+          address: "Đường Vĩnh Khánh, Phường 8, Quận 4",
+          category: "Sài Gòn Đêm & Món Đường Phố",
+          stamp: "Ốc Đêm Vĩnh Khánh 🦪",
+          vibeScore: "4.7 ⭐⭐⭐⭐⭐ Xôm Tụ Tới Sáng 🦪",
+          stars: 5,
+          url: "https://images.unsplash.com/photo-1555126634-323283e090fa?w=800&auto=format&fit=crop&q=80",
+          aiReview: "Mùi ốc nướng mỡ hành nức mũi, kéo cạ cứng ra nhâm nhi tán gẫu thâu đêm là chuẩn bài.",
+          coords: [10.7602, 106.7035]
+        }
+      ];
+
+      const p = presets[Math.floor(Math.random() * presets.length)];
+      document.getElementById('image-preview-img').src = p.url;
+      document.getElementById('input-image-url').value = p.url;
+      document.getElementById('input-location-name').value = p.name;
+      document.getElementById('input-district').value = p.district;
+      document.getElementById('input-address').value = p.address;
+      document.getElementById('input-category').value = p.category;
+      document.getElementById('input-stamp-badge').value = p.stamp;
+      document.getElementById('input-vibe-score').value = p.vibeScore;
+      document.getElementById('input-ai-review').value = p.aiReview;
+      document.getElementById('input-gps-lat').value = p.coords[0];
+      document.getElementById('input-gps-lng').value = p.coords[1];
+      setStarRating(p.stars || 5);
+
+      document.getElementById('gps-status-text').innerHTML = `<i class="fa-solid fa-location-dot text-pop-green"></i> <span>Toạ độ mẫu: ${p.coords[0]}, ${p.coords[1]}</span>`;
+      showToastNotification(`🖼️ Đã nạp ảnh thực tế: ${p.name}`);
+    }
+
+    function generateVibeReview() {
+      const cat = document.getElementById('input-category').value;
+      const name = document.getElementById('input-location-name').value.trim() || 'Góc Phố Sài Gòn';
+
+      let generatedReview = "Sáng sớm tạt vô làm ly cà phê sữa đá đậm đà ngồi ngắm phố xá, tỉnh cả người!";
+      let generatedBadge = `${name.slice(0, 16)} ☕`;
+      let vibeScore = "5.0 ⭐⭐⭐⭐⭐ Đậm Vị Sài Gòn ☕";
+
+      if (cat.includes("Chợ Lớn")) {
+        generatedReview = "Mùi sủi cảo nóng hổi quyện khói nhang trầm cổ kính, bước chân vô là mê đắm phong vị Chợ Lớn.";
+        generatedBadge = `${name.slice(0, 16)} 🏮`;
+        vibeScore = "5.0 ⭐⭐⭐⭐⭐ Chuẩn Vị Chợ Lớn 🏮";
+      } else if (cat.includes("Tâm Linh")) {
+        generatedReview = "Nhang vòng cuộn khói an yên giữa mái chùa cổ, bước vô là thấy lòng nhẹ nhõm liền.";
+        generatedBadge = `${name.slice(0, 16)} ⛩️`;
+        vibeScore = "5.0 ⭐⭐⭐⭐⭐ An Yên Thanh Tịnh ⛩️";
+      } else if (cat.includes("Đường Phố")) {
+        generatedReview = "Mùi ốc xào bơ tỏi thơm nức mũi, kéo ghế nhựa ngồi tám chuyện thâu đêm với cạ cứng là chuẩn bài.";
+        generatedBadge = `${name.slice(0, 16)} 🦪`;
+        vibeScore = "4.8 ⭐⭐⭐⭐⭐ Xôm Tụ Tới Sáng 🦪";
+      } else if (cat.includes("Di Sản")) {
+        generatedReview = "Kiến trúc trăm năm góc nào lên hình cũng đỉnh, cảm nhận trọn vẹn nét hào sảng Sài Gòn.";
+        generatedBadge = `${name.slice(0, 16)} 📬`;
+        vibeScore = "4.9 ⭐⭐⭐⭐⭐ Check-in Quốc Dân 🏛️";
+      } else if (cat.includes("Mua Sắm") || cat.includes("Thrift")) {
+        generatedReview = "Lội hẻm bới đồ hoặc xuống hầm quẩy đồ local brand cực cháy, lên outfit độc bản chuẩn phong cách.";
+        generatedBadge = `${name.slice(0, 16)} 🛍️`;
+        vibeScore = "4.7 ⭐⭐⭐⭐⭐ Streetwear Cực Cháy 🔥";
+      }
+
+      document.getElementById('input-ai-review').value = generatedReview;
+      document.getElementById('input-vibe-score').value = vibeScore;
+      setStarRating(5);
+      if (!document.getElementById('input-stamp-badge').value) {
+        document.getElementById('input-stamp-badge').value = generatedBadge;
+      }
+      showToastNotification(`✨ Đã tạo đánh giá vibe chân thật cho ${name}!`);
+    }
+
+    function handleCheckinSubmit(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('input-location-name').value.trim();
+      const district = document.getElementById('input-district').value;
+      const address = document.getElementById('input-address').value.trim();
+      const category = document.getElementById('input-category').value;
+      const date = document.getElementById('input-date').value;
+      const stampBadge = document.getElementById('input-stamp-badge').value.trim() || `${name} 📍`;
+      const vibeScore = document.getElementById('input-vibe-score').value || '5.0 ⭐⭐⭐⭐⭐ Cực Chill';
+      const userNotes = document.getElementById('input-user-notes').value.trim();
+      const aiReview = document.getElementById('input-ai-review').value.trim();
+      const imageUrl = document.getElementById('input-image-url').value;
+
+      const gpsLat = parseFloat(document.getElementById('input-gps-lat').value);
+      const gpsLng = parseFloat(document.getElementById('input-gps-lng').value);
+
+      const districtCoords = {
+        "Quận 1": [10.7769, 106.7009],
+        "Quận 3": [10.7845, 106.6842],
+        "Quận 5": [10.7540, 106.6630],
+        "Quận 6": [10.7480, 106.6350],
+        "Quận 4": [10.7600, 106.7050],
+        "Quận 10": [10.7710, 106.6680],
+        "Quận Phú Nhuận": [10.7990, 106.6800],
+        "Quận Bình Thạnh": [10.8030, 106.7000],
+        "TP. Thủ Đức": [10.8490, 106.7720]
+      };
+
+      let coords = [10.7769, 106.7009];
+      if (!isNaN(gpsLat) && !isNaN(gpsLng) && gpsLat !== 0 && gpsLng !== 0) {
+        coords = [gpsLat, gpsLng];
+      } else if (districtCoords[district]) {
+        const jitterLat = (Math.random() - 0.5) * 0.005;
+        const jitterLng = (Math.random() - 0.5) * 0.005;
+        coords = [districtCoords[district][0] + jitterLat, districtCoords[district][1] + jitterLng];
+      }
+
+      const newEntry = {
+        id: 'sg-' + Date.now(),
+        name,
+        district,
+        address: address || `${district}, TP. Hồ Chí Minh`,
+        category,
+        date,
+        imageUrl,
+        stampBadge,
+        vibeScore,
+        userNotes,
+        aiReview,
+        coords,
+        isFavorite: false
+      };
+
+      userEntries.unshift(newEntry);
+      saveUserData();
+      renderJournalFeed();
+      updateMetroProgress();
+      closeCheckinModal();
+
+      document.getElementById('input-gps-lat').value = '';
+      document.getElementById('input-gps-lng').value = '';
+      setupDefaultFormDate();
+
+      logUserActivity('checkin', 'Đóng dấu Check-in mới', `Đã lưu dấu tại "${name}" (${district}) · Vibe: ${vibeScore}`, '📸');
+      showToastNotification(`🎉 Đã đóng dấu "${name}" vào Passport!`);
+      switchTab('journal');
+    }
+
+    // ==========================================
+    // 11. FORTUNE COOKIE MODAL LOGIC
+    // ==========================================
+    function openFortuneModal() {
+      rollRandomFortune();
+      document.getElementById('fortune-modal').classList.remove('hidden');
+    }
+
+    function closeFortuneModal() {
+      document.getElementById('fortune-modal').classList.add('hidden');
+    }
+
+    function pickFortuneByMood(mood) {
+      const moodBtns = document.querySelectorAll('.fortune-mood-btn');
+      moodBtns.forEach(btn => {
+        if (btn.getAttribute('data-mood') === mood) {
+          btn.className = 'fortune-mood-btn flex-1 py-1 text-[11px] font-black rounded-lg bg-pop-yellow border border-pop-dark text-pop-dark';
+        } else {
+          btn.className = 'fortune-mood-btn flex-1 py-1 text-[11px] font-bold rounded-lg text-slate-600 hover:text-pop-dark';
+        }
+      });
+
+      const matched = SAIGON_FORTUNES.filter(f => f.mood === mood);
+      if (matched.length > 0) {
+        currentFortune = matched[Math.floor(Math.random() * matched.length)];
+        displayFortune();
+      }
+    }
+
+    function rollRandomFortune() {
+      const f = SAIGON_FORTUNES[Math.floor(Math.random() * SAIGON_FORTUNES.length)];
+      currentFortune = f;
+      displayFortune();
+    }
+
+    function displayFortune() {
+      if (!currentFortune) return;
+      document.getElementById('fortune-icon').textContent = currentFortune.icon;
+      document.getElementById('fortune-tag').textContent = currentFortune.category.toUpperCase();
+      document.getElementById('fortune-title').textContent = currentFortune.title;
+      document.getElementById('fortune-district').textContent = `📍 ${currentFortune.district}`;
+      document.getElementById('fortune-quote').textContent = currentFortune.quote;
+    }
+
+    function applyFortuneToCheckin() {
+      closeFortuneModal();
+      openCheckinModal();
+
+      document.getElementById('input-location-name').value = currentFortune.title;
+      document.getElementById('input-district').value = currentFortune.district;
+      document.getElementById('input-category').value = currentFortune.category;
+      document.getElementById('input-stamp-badge').value = currentFortune.stamp;
+      document.getElementById('input-ai-review').value = currentFortune.quote;
+      document.getElementById('input-vibe-score').value = '5.0 ⭐⭐⭐⭐⭐ Đậm Chất Sài Gòn ✨';
+      setStarRating(5);
+      
+      if (currentFortune.imageUrl) {
+        const previewImg = document.getElementById('image-preview-img');
+        const hiddenUrl = document.getElementById('input-image-url');
+        if (previewImg) previewImg.src = currentFortune.imageUrl;
+        if (hiddenUrl) hiddenUrl.value = currentFortune.imageUrl;
+      }
+
+      if (currentFortune.coords) {
+        document.getElementById('input-gps-lat').value = currentFortune.coords[0];
+        document.getElementById('input-gps-lng').value = currentFortune.coords[1];
+        document.getElementById('gps-status-text').innerHTML = `<i class="fa-solid fa-location-dot text-pop-green"></i> <span>Toạ độ quẻ: ${currentFortune.coords[0]}, ${currentFortune.coords[1]}</span>`;
+      }
+    }
+
+    // ==========================================
+    // 12. TOAST NOTIFICATION UTILITY
+    // ==========================================
+    let toastTimeout = null;
+    function showToastNotification(message) {
+      const toast = document.getElementById('toast-msg');
+      if (!toast) return;
+
+      toast.textContent = message;
+      toast.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'pointer-events-none', '-translate-y-4');
+      }, 2600);
+    }
+  </script>
+</body>
+</html>
